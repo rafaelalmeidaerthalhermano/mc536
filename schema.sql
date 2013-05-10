@@ -15,6 +15,22 @@ create table `location`(
 	primary key(`name`)
 );
 
+create table `city`(
+	`name`       varchar(50) NOT NULL,
+	`country`     varchar(10) NOT NULL,
+	foreign key(`country`)
+		references `country`(`name`)
+		on delete cascade
+		on update cascade,
+	primary key(`name`)
+);
+
+
+create table `Country`(
+	`name`       varchar(50) NOT NULL,
+	primary key(`name`)
+);
+
 create table `person`(
 	`uri`        varchar(50) NOT NULL,
 	`name`       varchar(50) NOT NULL,
