@@ -1,0 +1,8 @@
+{
+  "name": "mc536",
+  "version": "0.0.1",
+  "dependencies": {
+    "mysql": "2.0.x",
+    "xml2js": "0.2.x"
+  }
+}
