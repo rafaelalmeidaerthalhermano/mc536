@@ -9,7 +9,7 @@ var Country = function (params) {
         db(
             'INSERT INTO `country` SET ?',
             {
-                'name'     : this.name,
+                'name' : this.name,
             },
             function () {
                 cb(self);
@@ -19,20 +19,29 @@ var Country = function (params) {
 };
 
 Country.find = function (name, cb) {
-    if(name){
+    if (name) {
         require('./get')(
-            "http://api.geonames.org/search?username=augustomorgan&maxRows=1&type=json&q="+name,
+            "http://api.geonames.org/search?username=augustomorgan&maxRows=1&type=json&q=" + name,
             function (places) {
                 places = places.geonames[0];
-                if(places){
-                    var  country = new Country ({
+                if (places) {
+                    var country = new Country ({
                             name : places.countryName
                         });
-                    cb(country);
+                    if (cb) {
+                        cb(country);
+                    }
+                } else {
+                    if (cb) {
+                        cb(null);
+                    }
                 }
-                else cb(null);
             }
         );
+    } else {
+        if (cb) {
+            cb(null);
+        }
     }
 };
 

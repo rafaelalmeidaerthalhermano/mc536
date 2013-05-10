@@ -12,41 +12,50 @@ var City = function (params) {
             db(
                 'INSERT INTO `city` SET ?',
                 {
-                    'name'     : self.name,
-                    'country'     : self.country,
+                    'name' : self.name,
+                    'country' : self.country,
                 },
                 function () {
-                    cb(self);
+                    if (cb) {
+                        cb(self);
+                    }
                 }
             );
         });
     };
 
     this.createCountry = function(cb) {
-        require('./country').find(self.country, function(country){
+        require('./country').find(self.country, function (country) {
             country.save(function () {
-                cb(country);    
+                if (cb) {
+                    cb(country);
+                }
             });
         });
     };
 };
 
 City.find = function (name, cb) {
-    //TODO implementar as chamadas pro geonames
-    if(name){
+    if (name) {
         require('./get')(
-            "http://api.geonames.org/search?username=augustomorgan&maxRows=1&type=json&q="+name,
+            "http://api.geonames.org/search?username=augustomorgan&maxRows=1&type=json&q=" + name,
             function (places) {
                 places = places.geonames[0];
-                var  city = new City({
+                var city = new City({
                         name : places.name,
                         country : places.countryName
                     });
-                cb(city);
-            });
-    }
-    else cb(null)
-};
 
+                if (cb) {
+                    cb(city);
+                }
+            }
+        );
+    } else {
+        if (cb) {
+            cb(null);
+        }
+    }
+};
 
 module.exports = City;

@@ -10,7 +10,7 @@ var Style = function (params) {
         db(
             'INSERT INTO `style` SET ?',
             {
-                'category'    : this.category,
+                'category' : this.category,
                 'cultural_act' : this.culturalAct
             },
             function () {

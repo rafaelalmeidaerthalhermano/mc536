@@ -11,10 +11,12 @@ var Participate = function (params) {
             'INSERT INTO `participate` SET ?',
             {
                 'musician' : this.musician,
-                'band'     : this.band
+                'band' : this.band
             },
             function () {
-                cb(self);
+                if (cb) {
+                    cb(self);
+                }
             }
         );
     };

@@ -9,20 +9,22 @@ var Person = function (params) {
 
     this.save = function (cb) {
         self.createHometown(function (city) {
-           // console.log(city);
-            if(city)
+            if(city) {
                 self.hometown = city.name;
-            else self.hometown = null;
+            } else {
+                self.hometown = null;
+            }
             db(
                 'INSERT INTO `person` SET ?',
                 {
-                    'uri'      : self.uri,
-                    'name'     : self.name,
+                    'uri' : self.uri,
+                    'name' : self.name,
                     'hometown' : self.hometown
                 },
-                function (e) {
-                    //console.log(e);
-                    cb(self);
+                function () {
+                    if (cb) {
+                        cb(self);
+                    }
                 }
             );
         });
@@ -32,10 +34,14 @@ var Person = function (params) {
         require('./city').find(self.hometown, function (city) {
             if(city) {
                 city.save(function () {
-                    cb(city);
+                    if (cb) {
+                        cb(city);
+                    }
                 });
             } else {
-                cb(city);
+                if (cb) {
+                    cb(city);
+                }
             }
         });
     }

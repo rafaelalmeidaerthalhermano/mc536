@@ -10,11 +10,13 @@ var Know = function (params) {
         db(
             'INSERT INTO `know` SET ?',
             {
-                'person'   : self.person,
+                'person' : self.person,
                 'colleague': self.colleague
             },
             function () {
-                cb(self);
+                if (cb) {
+                    cb(self);
+                }
             }
         );
     };

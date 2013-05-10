@@ -9,10 +9,12 @@ var Category = function (params) {
         db(
             'INSERT INTO `category` SET ?',
             {
-                'name'     : self.name
+                'name' : self.name
             },
             function () {
-                cb(self);
+                if (cb) {
+                    cb(self);
+                }
             }
         );
     };

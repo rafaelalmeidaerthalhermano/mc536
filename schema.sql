@@ -5,13 +5,13 @@ create schema social;
 use social;
 
 create table `country`(
-	`name`       varchar(50) NOT NULL,
+	`name` varchar(50) NOT NULL,
 	primary key(`name`)
 );
 
 create table `city`(
-	`name`       varchar(50) NOT NULL,
-	`country`     varchar(10) NOT NULL,
+	`name` varchar(50) NOT NULL,
+	`country` varchar(10) NOT NULL,
 	foreign key(`country`)
 		references `country`(`name`)
 		on delete cascade
@@ -20,9 +20,9 @@ create table `city`(
 );
 
 create table `person`(
-	`uri`        varchar(50) NOT NULL,
-	`name`       varchar(50) NOT NULL,
-	`hometown`   varchar(50) NULL,
+	`uri` varchar(50) NOT NULL,
+	`name` varchar(50) NOT NULL,
+	`hometown` varchar(50) NULL,
 	foreign key(`hometown`)
 		references `city`(`name`)
 		on delete cascade
@@ -31,7 +31,7 @@ create table `person`(
 );
 
 create table `know`(
-	`person`     varchar(50) NOT NULL,
+	`person` varchar(50) NOT NULL,
 	`colleague`  varchar(50) NOT NULL,
 	foreign key(`person`)
 		references `person`(`uri`)
@@ -45,13 +45,13 @@ create table `know`(
 );
 
 create table `cultural_act`(
-	`name`       varchar(50) NOT NULL,
+	`name` varchar(50) NOT NULL,
 	primary key(`name`)
 );
 
 create table `band`(
-	`name`       varchar(50) NOT NULL,
-	`location`	 varchar(50) NOT NULL,
+	`name` varchar(50) NOT NULL,
+	`location` varchar(50) NOT NULL,
 	foreign key(`name`)
 		references `cultural_act`(`name`)
 		on delete cascade
@@ -64,8 +64,8 @@ create table `band`(
 );
 
 create table `similar`(
-	`band`   varchar(50) NOT NULL,
-	`similar`	 varchar(50) NOT NULL,
+	`band` varchar(50) NOT NULL,
+	`similar` varchar(50) NOT NULL,
 	foreign key(`band`)
 		references `band`(`name`)
 		on delete cascade
@@ -77,10 +77,10 @@ create table `similar`(
 	primary key(`band`,`similar`)
 );
 create table `movie`(
-	`name`       varchar(50) NOT NULL,
-	`plot`       varchar(50) NOT NULL,
+	`name` varchar(50) NOT NULL,
+	`plot` varchar(50) NOT NULL,
 	`IMDBrating` int NOT NULL,
-	`IMDBvotes`  int NOT NULL,
+	`IMDBvotes` int NOT NULL,
 	foreign key(`name`)
 		references `cultural_act`(`name`)
 		on delete cascade
@@ -89,28 +89,28 @@ create table `movie`(
 );
 
 create table `director`(
-	`name`       varchar(50) NOT NULL,
+	`name` varchar(50) NOT NULL,
 	primary key(`name`)
 );
 
 create table `actor`(
-	`name`       varchar(50) NOT NULL,
+	`name` varchar(50) NOT NULL,
 	primary key(`name`)
 );
 
 create table `category`(
-	`name`       varchar(50) NOT NULL,
+	`name` varchar(50) NOT NULL,
 	primary key(`name`)
 );
 
 create table `musician`(
-	`name`       varchar(50) NOT NULL,
+	`name` varchar(50) NOT NULL,
 	primary key(`name`)
 );
 
 create table `direct`(
-	`director`   varchar(50) NOT NULL,
-	`movie`      varchar(50) NOT NULL,
+	`director` varchar(50) NOT NULL,
+	`movie` varchar(50) NOT NULL,
 	foreign key(`director`)
 		references `director`(`name`)
 		on delete cascade
@@ -123,8 +123,8 @@ create table `direct`(
 );
 
 create table `act`(
-	`actor`      varchar(50) NOT NULL,
-	`movie`      varchar(50) NOT NULL,
+	`actor` varchar(50) NOT NULL,
+	`movie` varchar(50) NOT NULL,
 	foreign key(`actor`)
 		references `actor`(`name`)
 		on delete cascade
@@ -137,7 +137,7 @@ create table `act`(
 );
 
 create table `style`(
-	`category`     varchar(50) NOT NULL,
+	`category` varchar(50) NOT NULL,
 	`cultural_act` varchar(50) NOT NULL,
 	foreign key(`category`)
 		references `category`(`name`)
@@ -151,8 +151,8 @@ create table `style`(
 );
 
 create table `participate`(
-	`musician`   varchar(50) NOT NULL,
-	`band`       varchar(50) NOT NULL,
+	`musician` varchar(50) NOT NULL,
+	`band` varchar(50) NOT NULL,
 	foreign key(`musician`)
 		references `musician`(`name`)
 		on delete cascade
@@ -165,9 +165,9 @@ create table `participate`(
 );
 
 create table `like`(
-	`person`       varchar(50) NOT NULL,
+	`person` varchar(50) NOT NULL,
 	`cultural_act` varchar(50) NOT NULL,
-	`rating`       int NOT NULL,
+	`rating` int NOT NULL,
 	foreign key(`person`)
 		references `person`(`uri`)
 		on delete cascade

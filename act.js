@@ -10,11 +10,13 @@ var Act = function (params) {
         db(
             'INSERT INTO `act` SET ?',
             {
-                'actor'    : self.actor,
-                'movie'    : self.movie
+                'actor' : self.actor,
+                'movie' : self.movie
             },
             function () {
-                cb(self);
+                if (cb) {
+                    cb(self);
+                }
             }
         );
     };

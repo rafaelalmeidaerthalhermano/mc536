@@ -11,12 +11,14 @@ var Like = function (params) {
         db(
             'INSERT INTO `like` SET ?',
             {
-                'person'     : self.person,
+                'person' : self.person,
                 'culturalAct': self.culturalAct,
-                'rating'     : self.rating
+                'rating' : self.rating
             },
             function () {
-                cb(self);
+                if (cb) {
+                    cb(self);
+                }
             }
         );
     };

@@ -9,10 +9,12 @@ var Director = function (params) {
         db(
             'INSERT INTO `director` SET ?',
             {
-                'name'     : self.name
+                'name' : self.name
             },
             function () {
-                cb(self);
+                if (cb) {
+                    cb(self);
+                }
             }
         );
     };
