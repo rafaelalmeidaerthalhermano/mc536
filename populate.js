@@ -11,7 +11,7 @@ var open = function (file, cb) {
     });
 }
 
-
+/*
 open('/pessoas.xml', function (persons) {
     for (var i in persons.Persons.Person) {
         var Person = require('./person'),
@@ -26,7 +26,7 @@ open('/pessoas.xml', function (persons) {
         });
     }
 });
-
+*/
 /*
 open('/CurteFilme.xml', function (likesMovies) {
     for (var i in likesMovies.AllLikesMovie.LikesMovie) {
@@ -39,19 +39,21 @@ open('/CurteFilme.xml', function (likesMovies) {
     }
 });*/
 
-/*
+
 
 open('/CurteMusica.xml', function (likesMusic) {
     for (var i in likesMusic.AllLikesMusic.LikesMusic) {
     	require('./band').find(
     		likesMusic.AllLikesMusic.LikesMusic[i].$.bandUri.replace("http://en.wikipedia.org/wiki/", ""),
     		function (band) {
-    			band.save();
+    			band.save(function(){
+                    
+                });
     		}
 		)
     }
 });
-*/
+
 /*
 	criar pessoa
 
