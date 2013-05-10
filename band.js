@@ -4,27 +4,29 @@ var Band = function (params) {
     var self = this;
 
     this.name = params.name;
-    this.location = params.location;
+    this.country = params.country;
     this.similars = params.similars;
     this.musicians = params.musicians;
     this.categories = params.categories;
 
     this.save = function (cb) {
         var locationCreated = false,
-            relatedsCreated = false,
+            similarsCreated = true,
             musiciansCreated = false,
             categoriesCreated = false;
 
         self.createCulturalAct(function () {
-                //self.createLocation(function (location) {
-                    //self.location = location.name;
+                self.createCountry(function (country) {
+                    if(country)
+                        self.country = country.name;
+                    else self.country = null;
                     self.createBand(function () {
-                        self.createSimilars(function () {
+                        /*self.createSimilars(function () {
                             similarsCreated = true;
                             if (similarsCreated && musiciansCreated && categoriesCreated) {
                                 cb();
                             }
-                        });
+                        });*/
                         self.createMusicians(function () {
                             musiciansCreated = true;
                             if (similarsCreated && musiciansCreated && categoriesCreated) {
@@ -38,7 +40,7 @@ var Band = function (params) {
                             }
                         });
                     });
-                //});
+                });
         });
     };
 
@@ -46,7 +48,8 @@ var Band = function (params) {
         db(
             'INSERT INTO `band` SET ?',
             {
-                'name'      : this.name
+                'name'      : self.name,
+                'location'  : self.country
             },
             function () {
                 cb(self);
@@ -66,11 +69,13 @@ var Band = function (params) {
         );
     };
 
-    this.createLocation = function (cb) {
-        require('./location').find(this.location, function (location) {
-            location.save(function () {
-                cb(location);
-            });
+    this.createCountry = function (cb) {
+        require('./country').find(self.country, function (country) {
+            if(country)
+                country.save(function () {
+                    cb(country);
+                });
+            else cb(null);
         });
     };
 
@@ -102,7 +107,8 @@ var Band = function (params) {
 
     this.createCategory = function (category, cb) {
         category.save(function () {
-            var style = new require('./style')({
+            var Style = require('./style'),
+                style = new Style({
                 category    : category.name,
                 culturalAct : self.name
             });
@@ -127,7 +133,8 @@ var Band = function (params) {
 
     this.createMusician = function (musician, cb) {
         musician.save(function () {
-            var participate = new require('./participate')({
+            var Participate = require('./participate'),
+                participate = new Participate({
                 musician    : musician.name,
                 band        : self.name
             });
@@ -195,7 +202,7 @@ Band.find = function (name, cb) {
                     }
                 }
 
-                var place = undefined;
+                var place = null;
                 if(lastFMBand.bio){
                     if(lastFMBand.bio.placeformed)
                         place = lastFMBand.bio.placeformed;
@@ -206,7 +213,7 @@ Band.find = function (name, cb) {
                         similars   : similars,
                         musicians  : bandMembers,
                         categories : categories,
-                        location   : place
+                        country    : place
                     });
 
                 //console.log(band);

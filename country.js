@@ -25,10 +25,13 @@ Country.find = function (name, cb) {
             "http://api.geonames.org/search?username=augustomorgan&maxRows=1&type=json&q="+name,
             function (places) {
                 places = places.geonames[0];
-                var  country = new Country ({
-                        name : places.countryName
-                    });
-                cb(country);
+                if(places){
+                    var  country = new Country ({
+                            name : places.countryName
+                        });
+                    cb(country);
+                }
+                else cb(null);
             });
     }
 };
