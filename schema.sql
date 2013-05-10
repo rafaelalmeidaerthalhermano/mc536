@@ -1,5 +1,8 @@
 -- create schema socialIC;
 -- create schema social;
+drop schema social;
+create schema social;
+use social;
 
 create table `location`(
 	`name`       varchar(50) NOT NULL,
@@ -27,11 +30,11 @@ create table `know`(
 	`person`     varchar(50) NOT NULL,
 	`colleague`  varchar(50) NOT NULL,
 	foreign key(`person`)
-		references `person`(`name`)
+		references `person`(`uri`)
 		on delete cascade
 		on update cascade,
 	foreign key(`colleague`)
-		references `person`(`name`)
+		references `person`(`uri`)
 		on delete cascade
 		on update cascade,
 	primary key(`person`, `colleague`)
@@ -44,8 +47,13 @@ create table `cultural_act`(
 
 create table `band`(
 	`name`       varchar(50) NOT NULL,
+	`location`	 varchar(50) NOT NULL,
 	foreign key(`name`)
 		references `cultural_act`(`name`)
+		on delete cascade
+		on update cascade,
+	foreign key(`location`)
+		references `location`(`name`)
 		on delete cascade
 		on update cascade,
 	primary key(`name`)
@@ -139,26 +147,12 @@ create table `participate`(
 	primary key(`musician`, `band`)
 );
 
-create table `occur`(
-	`location`   varchar(50) NOT NULL,
-	`band`       varchar(50) NOT NULL,
-	foreign key(`location`)
-		references `location`(`name`)
-		on delete cascade
-		on update cascade,
-	foreign key(`band`)
-		references `band`(`name`)
-		on delete cascade
-		on update cascade,
-	primary key(`location`, `band`)
-);
-
 create table `like`(
 	`person`       varchar(50) NOT NULL,
 	`cultural_act` varchar(50) NOT NULL,
 	`rating`       int NOT NULL,
 	foreign key(`person`)
-		references `person`(`name`)
+		references `person`(`uri`)
 		on delete cascade
 		on update cascade,
 	foreign key(`cultural_act`)

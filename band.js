@@ -4,45 +4,46 @@ var Band = function (params) {
     var self = this;
 
     this.name = params.name;
-    this.locations = params.locations;
+    this.location = params.location;
     this.relateds = params.relateds;
     this.musicians = params.musicians;
     this.categories = params.categories;
 
     this.save = function (cb) {
         var culturalActCreated = false,
-            locationsCreated = false,
+            locationCreated = false,
             relatedsCreated = false,
             musiciansCreated = false,
             categoriesCreated = false;
 
-        self.createLocations(function () {
-            locationsCreated = true;
-            if (locationsCreated && relatedsCreated && musiciansCreated && categoriesCreated && culturalActCreated) {
+        self.createLocation(function (location) {
+            self.location = location.name;
+            locationCreated = true;
+            if (locationCreated && relatedsCreated && musiciansCreated && categoriesCreated && culturalActCreated) {
                 self.createBand(cb);
             }
         });
         self.createRelateds(function () {
             relatedsCreated = true;
-            if (locationsCreated && relatedsCreated && musiciansCreated && categoriesCreated && culturalActCreated) {
+            if (locationCreated && relatedsCreated && musiciansCreated && categoriesCreated && culturalActCreated) {
                 self.createBand(cb);
             }
         });
         self.createMusicians(function () {
             musiciansCreated = true;
-            if (locationsCreated && relatedsCreated && musiciansCreated && categoriesCreated && culturalActCreated) {
+            if (locationCreated && relatedsCreated && musiciansCreated && categoriesCreated && culturalActCreated) {
                 self.createBand(cb);
             }
         });
         self.createCategories(function () {
             categoriesCreated = true;
-            if (locationsCreated && relatedsCreated && musiciansCreated && categoriesCreated && culturalActCreated) {
+            if (locationCreated && relatedsCreated && musiciansCreated && categoriesCreated && culturalActCreated) {
                 self.createBand(cb);
             }
         });
         self.createCulturalAct(function () {
             culturalActCreated = true;
-            if (locationsCreated && relatedsCreated && musiciansCreated && categoriesCreated && culturalActCreated) {
+            if (locationCreated && relatedsCreated && musiciansCreated && categoriesCreated && culturalActCreated) {
                 self.createBand(cb);
             }
         });
@@ -72,29 +73,12 @@ var Band = function (params) {
         );
     };
 
-    this.createLocation = function (location, cb) {
-        location.save(function () {
-            var occur = new require('./occur')({
-                band        : self.name
-                location    : location.name
-            });
-            occur.save(function () {
+    this.createLocation = function (cb) {
+        require('./location').find(this.location, function (location) {
+            location.save(function () {
                 cb(location);
             });
         });
-    };
-
-    this.createLocations = function (cb) {
-        var handled = 0;
-
-        for (var i in self.locations) {
-            self.createLocation(self.locations[i], function () {
-                handled++;
-                if (handled >= self.locations.length) {
-                    cb(self.locations);
-                }
-            });
-        }
     };
 
     this.createRelated = function (band, cb) {

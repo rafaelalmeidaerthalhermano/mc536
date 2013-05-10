@@ -13,7 +13,7 @@
 	});
 
 	buscar filme
-	require('./movie').find(function (movie) {
+	require('./movie').find(name, function (movie) {
 		movie.save(function () { CRIAR O LIKE });
 	});
 
