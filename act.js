@@ -3,7 +3,7 @@ var db = require('./db');
 var Act = function (params) {
     var self = this;
 
-    this.actor = params.director;
+    this.actor = params.actor;
     this.movie = params.movie;
 
     this.save = function (cb) {
