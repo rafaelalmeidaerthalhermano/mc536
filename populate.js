@@ -20,7 +20,10 @@ open('/pessoas.xml', function (persons) {
                 name:persons.Persons.Person[i].$.name,
                 hometown:persons.Persons.Person[i].$.hometown
             });
-        person.save();
+        console.log(person);
+        person.save(function () {
+
+        });
     }
 });
 

@@ -4,6 +4,11 @@ drop schema social;
 create schema social;
 use social;
 
+create table `country`(
+	`name`       varchar(50) NOT NULL,
+	primary key(`name`)
+);
+
 create table `city`(
 	`name`       varchar(50) NOT NULL,
 	`country`     varchar(10) NOT NULL,
@@ -14,16 +19,10 @@ create table `city`(
 	primary key(`name`)
 );
 
-
-create table `country`(
-	`name`       varchar(50) NOT NULL,
-	primary key(`name`)
-);
-
 create table `person`(
 	`uri`        varchar(50) NOT NULL,
 	`name`       varchar(50) NOT NULL,
-	`hometown`   varchar(50) NOT NULL,
+	`hometown`   varchar(50) NULL,
 	foreign key(`hometown`)
 		references `city`(`name`)
 		on delete cascade

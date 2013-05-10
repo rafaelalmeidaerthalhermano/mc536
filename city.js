@@ -1,48 +1,52 @@
 var db = require('./db');
 
-var Location = function (params) {
+var City = function (params) {
     var self = this;
 
     this.name = params.name;
-    this.type = params.type;
-    this.parent = params.parent;
+    this.country = params.country;
 
     this.save = function (cb) {
-        db(
-            'INSERT INTO `location` SET ?',
-            {
-                'name'     : this.name,
-                'type'     : this.type,
-                'parent'   : this.parent
-            },
-            function () {
-                cb(self);
-            }
-        );
+        self.createCountry(function (country) {
+            self.country = country.name;
+            db(
+                'INSERT INTO `city` SET ?',
+                {
+                    'name'     : self.name,
+                    'country'     : self.country,
+                },
+                function () {
+                    cb(self);
+                }
+            );
+        });
+    };
+
+    this.createCountry = function(cb) {
+        require('./country').find(self.country, function(country){
+            country.save(function () {
+                cb(country);    
+            });
+        });
     };
 };
 
-Location.find = function (name, cb) {
+City.find = function (name, cb) {
     //TODO implementar as chamadas pro geonames
     if(name){
         require('./get')(
             "http://api.geonames.org/search?username=augustomorgan&maxRows=1&type=json&q="+name,
             function (places) {
-                console.log(places.geonames[0].name);
+                places = places.geonames[0];
+                var  city = new City({
+                        name : places.name,
+                        country : places.countryName
+                    });
+                cb(city);
             });
     }
-
-    /*
-    criar objeto location para retornar no callback
-
-    var location = new Location ({
-        name      : '',
-        type      : '',
-        parent    : ''
-    });
-
-    cb(location)
-    */
+    else cb(null)
 };
 
-module.exports = Location;
+
+module.exports = City;
