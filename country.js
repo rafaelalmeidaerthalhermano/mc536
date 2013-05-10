@@ -19,7 +19,6 @@ var Country = function (params) {
 };
 
 Country.find = function (name, cb) {
-    //TODO implementar as chamadas pro geonames
     if(name){
         require('./get')(
             "http://api.geonames.org/search?username=augustomorgan&maxRows=1&type=json&q="+name,
@@ -32,7 +31,8 @@ Country.find = function (name, cb) {
                     cb(country);
                 }
                 else cb(null);
-            });
+            }
+        );
     }
 };
 

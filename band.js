@@ -21,12 +21,12 @@ var Band = function (params) {
                         self.country = country.name;
                     else self.country = null;
                     self.createBand(function () {
-                        /*self.createSimilars(function () {
+                        self.createSimilars(function () {
                             similarsCreated = true;
                             if (similarsCreated && musiciansCreated && categoriesCreated) {
                                 cb();
                             }
-                        });*/
+                        });
                         self.createMusicians(function () {
                             musiciansCreated = true;
                             if (similarsCreated && musiciansCreated && categoriesCreated) {
