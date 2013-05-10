@@ -4,17 +4,6 @@ drop schema social;
 create schema social;
 use social;
 
-create table `location`(
-	`name`       varchar(50) NOT NULL,
-	`type`       varchar(10) NOT NULL,
-	`parent`     varchar(10) NULL,
-	foreign key(`parent`)
-		references `location`(`name`)
-		on delete cascade
-		on update cascade,
-	primary key(`name`)
-);
-
 create table `city`(
 	`name`       varchar(50) NOT NULL,
 	`country`     varchar(10) NOT NULL,
@@ -26,7 +15,7 @@ create table `city`(
 );
 
 
-create table `Country`(
+create table `country`(
 	`name`       varchar(50) NOT NULL,
 	primary key(`name`)
 );
@@ -36,7 +25,7 @@ create table `person`(
 	`name`       varchar(50) NOT NULL,
 	`hometown`   varchar(50) NOT NULL,
 	foreign key(`hometown`)
-		references `location`(`name`)
+		references `city`(`name`)
 		on delete cascade
 		on update cascade,
 	primary key(`uri`)
@@ -69,7 +58,7 @@ create table `band`(
 		on delete cascade
 		on update cascade,
 	foreign key(`location`)
-		references `location`(`name`)
+		references `country`(`name`)
 		on delete cascade
 		on update cascade,
 	primary key(`name`)
