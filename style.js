@@ -11,7 +11,7 @@ var Style = function (params) {
             'INSERT INTO `style` SET ?',
             {
                 'category'    : this.category,
-                'culturalAct' : this.culturalAct
+                'cultural_act' : this.culturalAct
             },
             function () {
                 cb(self);

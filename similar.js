@@ -1,17 +1,17 @@
 var db = require('./db');
 
-var Occur = function (params) {
+var Similar = function (params) {
     var self = this;
 
     this.band = params.band;
-    this.location = params.location;
+    this.similar = params.similar;
 
     this.save = function (cb) {
         db(
-            'INSERT INTO `occur` SET ?',
+            'INSERT INTO `similar` SET ?',
             {
-                'band'        : this.band,
-                'location'    : this.location
+                'band'    : this.band,
+                'similar' : this.similar
             },
             function () {
                 cb(self);
@@ -20,4 +20,4 @@ var Occur = function (params) {
     };
 };
 
-module.exports = Occur;
+module.exports = Similar;

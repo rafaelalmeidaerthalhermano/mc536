@@ -107,6 +107,7 @@ var Movie = function (params) {
                 category    : category.name,
                 culturalAct : self.name
             });
+            
             style.save(function () {
                 cb(category);
             });

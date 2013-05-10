@@ -11,10 +11,11 @@ var open = function (file, cb) {
     });
 }
 
-/*
+
 open('/pessoas.xml', function (persons) {
     for (var i in persons.Persons.Person) {
-        var person = new require('./person') ({
+        var Person = require('./person'),
+        	person = new Person ({
                 uri:persons.Persons.Person[i].$.uri.replace("http://www.ic.unicamp.br/MC536/2013/1/",""),
                 name:persons.Persons.Person[i].$.name,
                 hometown:persons.Persons.Person[i].$.hometown
@@ -22,8 +23,8 @@ open('/pessoas.xml', function (persons) {
         person.save();
     }
 });
-*/
 
+/*
 open('/CurteFilme.xml', function (likesMovies) {
     for (var i in likesMovies.AllLikesMovie.LikesMovie) {
     	require('./movie').find(
@@ -33,7 +34,21 @@ open('/CurteFilme.xml', function (likesMovies) {
     		}
 		)
     }
+});*/
+
+/*
+
+open('/CurteMusica.xml', function (likesMusic) {
+    for (var i in likesMusic.AllLikesMusic.LikesMusic) {
+    	require('./band').find(
+    		likesMusic.AllLikesMusic.LikesMusic[i].$.bandUri.replace("http://en.wikipedia.org/wiki/", ""),
+    		function (band) {
+    			band.save();
+    		}
+		)
+    }
 });
+*/
 /*
 	criar pessoa
 

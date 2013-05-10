@@ -5,47 +5,40 @@ var Band = function (params) {
 
     this.name = params.name;
     this.location = params.location;
-    this.relateds = params.relateds;
+    this.similars = params.similars;
     this.musicians = params.musicians;
     this.categories = params.categories;
 
     this.save = function (cb) {
-        var culturalActCreated = false,
-            locationCreated = false,
+        var locationCreated = false,
             relatedsCreated = false,
             musiciansCreated = false,
             categoriesCreated = false;
 
-        self.createLocation(function (location) {
-            self.location = location.name;
-            locationCreated = true;
-            if (locationCreated && relatedsCreated && musiciansCreated && categoriesCreated && culturalActCreated) {
-                self.createBand(cb);
-            }
-        });
-        self.createRelateds(function () {
-            relatedsCreated = true;
-            if (locationCreated && relatedsCreated && musiciansCreated && categoriesCreated && culturalActCreated) {
-                self.createBand(cb);
-            }
-        });
-        self.createMusicians(function () {
-            musiciansCreated = true;
-            if (locationCreated && relatedsCreated && musiciansCreated && categoriesCreated && culturalActCreated) {
-                self.createBand(cb);
-            }
-        });
-        self.createCategories(function () {
-            categoriesCreated = true;
-            if (locationCreated && relatedsCreated && musiciansCreated && categoriesCreated && culturalActCreated) {
-                self.createBand(cb);
-            }
-        });
         self.createCulturalAct(function () {
-            culturalActCreated = true;
-            if (locationCreated && relatedsCreated && musiciansCreated && categoriesCreated && culturalActCreated) {
-                self.createBand(cb);
-            }
+                //self.createLocation(function (location) {
+                    //self.location = location.name;
+                    self.createBand(function () {
+                        self.createSimilars(function () {
+                            similarsCreated = true;
+                            if (similarsCreated && musiciansCreated && categoriesCreated) {
+                                cb();
+                            }
+                        });
+                        self.createMusicians(function () {
+                            musiciansCreated = true;
+                            if (similarsCreated && musiciansCreated && categoriesCreated) {
+                                cb();
+                            }
+                        });
+                        self.createCategories(function () {
+                            categoriesCreated = true;
+                            if (similarsCreated && musiciansCreated && categoriesCreated) {
+                                cb();
+                            }
+                        });
+                    });
+                //});
         });
     };
 
@@ -81,26 +74,27 @@ var Band = function (params) {
         });
     };
 
-    this.createRelated = function (band, cb) {
+    this.createSimilar = function (band, cb) {
         band.save(function () {
-            var related = new require('./related')({
-                band        : self.name
-                related     : band.name
+            var Similar = require('./similar'),
+                similar = new Similar ({
+                band        : self.name,
+                similar     : band.name
             });
-            related.save(function () {
+            similar.save(function () {
                 cb(band);
             });
         });
     };
 
-    this.createRelateds = function (cb) {
+    this.createSimilars = function (cb) {
         var handled = 0;
 
-        for (var i in self.relateds) {
-            self.createRelated(self.relateds[i], function () {
+        for (var i in self.similars) {
+            self.createSimilars(self.similars[i], function () {
                 handled++;
-                if (handled >= self.relateds.length) {
-                    cb(self.relateds);
+                if (handled >= self.similars.length) {
+                    cb(self.similars);
                 }
             });
         }
@@ -109,7 +103,7 @@ var Band = function (params) {
     this.createCategory = function (category, cb) {
         category.save(function () {
             var style = new require('./style')({
-                category    : category.name
+                category    : category.name,
                 culturalAct : self.name
             });
             style.save(function () {
@@ -134,7 +128,7 @@ var Band = function (params) {
     this.createMusician = function (musician, cb) {
         musician.save(function () {
             var participate = new require('./participate')({
-                musician    : musician.name
+                musician    : musician.name,
                 band        : self.name
             });
             participate.save(function () {
@@ -158,6 +152,71 @@ var Band = function (params) {
 };
 
 Band.find = function (name, cb) {
+    require('./get')(
+        "http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&autocorrect=1&api_key=206336a6642d03f381ec036dc6eb07f9&format=json&artist=" + name,
+        function (lastFMBand) {
+            lastFMBand = lastFMBand.artist;
+                if(lastFMBand) {
+
+                var Musician = require('./musician'),
+                    bandMembers = [],
+                    tempBandMembers = lastFMBand.bandmembers;
+
+                if(tempBandMembers){
+                    for(var i in tempBandMembers.member) {
+                        bandMembers.push(new Musician ({
+                            name   : tempBandMembers.member[i].name
+                        }));
+                    }
+                }
+
+                var Similar = require('./similar'),
+                    similars = [],
+                    tempSimilars = lastFMBand.similar;
+                
+                if(tempSimilars) {          
+                    for(var i in tempSimilars.artist) {
+                        similars.push(new Similar ({
+                            band   : lastFMBand.name,
+                            similar: tempSimilars.artist[i].name
+                        }));
+                    }
+                }
+
+                var Category = require('./category'),
+                    categories = [],
+                    tempCategories = lastFMBand.tags;
+                
+                if(tempCategories) {
+                    for(var i in tempCategories.tag) {
+                        categories.push(new Category ({
+                            name   : tempCategories.tag[i].name
+                        }));
+                    }
+                }
+
+                var place = undefined;
+                if(lastFMBand.bio){
+                    if(lastFMBand.bio.placeformed)
+                        place = lastFMBand.bio.placeformed;
+                }
+
+                var band = new Band ({
+                        name       : lastFMBand.name,
+                        similars   : similars,
+                        musicians  : bandMembers,
+                        categories : categories,
+                        location   : place
+                    });
+
+                //console.log(band);
+                cb(band)
+            }
+            else console.log("Banda Nao Encontrada!" + name);
+        }
+    );
+
+
     //TODO implementar as chamadas pro music brainz e lastfm
 
     /*
