@@ -59,6 +59,19 @@ create table `band`(
 	primary key(`name`)
 );
 
+create table `similar`(
+	`band`   varchar(50) NOT NULL,
+	`similar`	 varchar(50) NOT NULL,
+	foreign key(`band`)
+		references `band`(`name`)
+		on delete cascade
+		on update cascade,
+	foreign key(`similar`)
+		references `band`(`name`)
+		on delete cascade
+		on update cascade,
+	primary key(`band`,`similar`)
+);
 create table `movie`(
 	`name`       varchar(50) NOT NULL,
 	`plot`       varchar(50) NOT NULL,
