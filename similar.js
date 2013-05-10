@@ -10,7 +10,7 @@ var Similar = function (params) {
         db(
             'INSERT INTO `similar` SET ?',
             {
-                'band'    : this.band,
+                'band' : this.band,
                 'similar' : this.similar
             },
             function () {

@@ -11,10 +11,12 @@ var Direct = function (params) {
             'INSERT INTO `direct` SET ?',
             {
                 'director' : self.director,
-                'movie'    : self.movie
+                'movie' : self.movie
             },
             function () {
-                cb(self);
+                if (cb) {
+                    cb(self);
+                }
             }
         );
     };

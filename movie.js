@@ -21,22 +21,25 @@ var Movie = function (params) {
                 self.createDirectors(function () {
                     directorsCreated = true;
                     if (directorsCreated && actorsCreated && categoriesCreated) {
-                        if(cb)
-                            cb();
+                        if (cb) {
+                            cb(self);
+                        }
                     }
                 });
                 self.createActors(function () {
                     actorsCreated = true;
                     if (directorsCreated && actorsCreated && categoriesCreated) {
-                        if(cb)
-                            cb();
+                        if (cb) {
+                            cb(self);
+                        }
                     }
                 });
                 self.createCategories(function () {
                     categoriesCreated = true;
                     if (directorsCreated && actorsCreated && categoriesCreated) {
-                        if(cb)
-                            cb();
+                        if (cb) {
+                            cb(self);
+                        }
                     }
                 });
 
@@ -48,9 +51,9 @@ var Movie = function (params) {
         db(
             'INSERT INTO `movie` SET ?',
             {
-                'name'      : self.name,
-                'plot'      : self.plot,
-                'IMDBrating': self.IMDBrating,
+                'name' : self.name,
+                'plot' : self.plot,
+                'IMDBrating' : self.IMDBrating,
                 'IMDBvotes' : self.IMDBvotes,
             },
             function () {
@@ -65,10 +68,12 @@ var Movie = function (params) {
         db(
             'INSERT INTO `cultural_act` SET ?',
             {
-                'name'     : self.name,
+                'name' : self.name,
             },
             function () {
-                cb({name : self.name});
+                if (cb) {
+                    cb({name : self.name});
+                }
             }
         );
     };
@@ -77,11 +82,13 @@ var Movie = function (params) {
         director.save(function () {
             var Direct = require('./direct'),
                 direct = new Direct({
-                director : director.name,
-                movie    : self.name
-            });
+                    director : director.name,
+                    movie : self.name
+                });
             direct.save(function () {
-                cb(director)
+                if (cb) {
+                    cb(director);
+                }
             });
         });
     };
@@ -94,7 +101,9 @@ var Movie = function (params) {
             self.createDirector(self.directors[i], function () {
                 handled++;
                 if (handled >= self.directors.length) {
-                    cb(self.directors);
+                    if (cb) {
+                        cb(self.directors);
+                    }
                 }
             });
         }
@@ -104,12 +113,14 @@ var Movie = function (params) {
         category.save(function () {
             var Style = require('./style'),
                 style = new Style({
-                category    : category.name,
-                culturalAct : self.name
-            });
+                    category : category.name,
+                    culturalAct : self.name
+                });
             
             style.save(function () {
-                cb(category);
+                if (cb) {
+                    cb(category);
+                }
             });
         });
     };
@@ -122,7 +133,9 @@ var Movie = function (params) {
             self.createCategory(self.categories[i], function () {
                 handled++;
                 if (handled >= self.categories.length) {
-                    cb(self.categories);
+                    if (cb) {
+                        cb(self.categories);
+                    }
                 }
             });
         }
@@ -132,11 +145,13 @@ var Movie = function (params) {
         actor.save(function () {
             var Act = require('./act'),
                 act = new Act({
-                actor    : actor.name,
-                movie    : self.name
-            });
+                    actor : actor.name,
+                    movie : self.name
+                });
             act.save(function () {
-                cb(actor);
+                if (cb) {
+                    cb(actor);
+                }
             });
         });
     };
@@ -148,7 +163,9 @@ var Movie = function (params) {
             self.createActor(self.actors[i], function () {
                 handled++;
                 if (handled >= self.actors.length) {
-                    cb(self.actors);
+                    if (cb) {
+                        cb(self.actors);
+                    }
                 }
             });
         }
@@ -190,17 +207,18 @@ Movie.find = function (name, cb) {
             }
 
             var movie = new Movie ({
-                    name      : tempMovie.Title,
-                    plot      : tempMovie.Plot,
+                    name : tempMovie.Title,
+                    plot : tempMovie.Plot,
                     IMDBrating: tempMovie.imdbRating,
                     IMDBvotes : tempMovie.imdbVotes,
-                    
                     directors : directors,
                     actors : actors,
                     categories : categories
                 });
 
-            cb(movie)
+            if (cb) {
+                cb(movie);
+            }
         }
     );
 };

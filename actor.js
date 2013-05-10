@@ -9,10 +9,12 @@ var Actor = function (params) {
         db(
             'INSERT INTO `actor` SET ?',
             {
-                'name'     : self.name
+                'name' : self.name
             },
             function () {
-                cb(self);
+                if (cb) {
+                    cb(self);
+                }
             }
         );
     };
