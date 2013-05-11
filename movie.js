@@ -66,7 +66,7 @@ var Movie = function (params) {
 
     this.createCulturalAct = function (cb) {
         db(
-            'INSERT INTO `cultural_act` SET ?',
+            'INSERT INTO `culturalAct` SET ?',
             {
                 'name' : self.name,
             },

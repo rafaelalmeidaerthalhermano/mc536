@@ -44,16 +44,16 @@ create table `know`(
 	primary key(`person`, `colleague`)
 );
 
-create table `cultural_act`(
+create table `culturalAct`(
 	`name` varchar(50) NOT NULL,
 	primary key(`name`)
 );
 
 create table `band`(
 	`name` varchar(50) NOT NULL,
-	`location` varchar(50) NOT NULL,
+	`location` varchar(50) NULL,
 	foreign key(`name`)
-		references `cultural_act`(`name`)
+		references `culturalAct`(`name`)
 		on delete cascade
 		on update cascade,
 	foreign key(`location`)
@@ -78,11 +78,11 @@ create table `similar`(
 );
 create table `movie`(
 	`name` varchar(50) NOT NULL,
-	`plot` varchar(50) NOT NULL,
-	`IMDBrating` int NOT NULL,
+	`plot` varchar(500) NOT NULL,
+	`IMDBrating` float NOT NULL,
 	`IMDBvotes` int NOT NULL,
 	foreign key(`name`)
-		references `cultural_act`(`name`)
+		references `culturalAct`(`name`)
 		on delete cascade
 		on update cascade,
 	primary key(`name`)
@@ -138,16 +138,16 @@ create table `act`(
 
 create table `style`(
 	`category` varchar(50) NOT NULL,
-	`cultural_act` varchar(50) NOT NULL,
+	`culturalAct` varchar(50) NOT NULL,
 	foreign key(`category`)
 		references `category`(`name`)
 		on delete cascade
 		on update cascade,
-	foreign key(`cultural_act`)
-		references `cultural_act`(`name`)
+	foreign key(`culturalAct`)
+		references `culturalAct`(`name`)
 		on delete cascade
 		on update cascade,
-	primary key(`category`, `cultural_act`)
+	primary key(`category`, `culturalAct`)
 );
 
 create table `participate`(
@@ -166,15 +166,15 @@ create table `participate`(
 
 create table `like`(
 	`person` varchar(50) NOT NULL,
-	`cultural_act` varchar(50) NOT NULL,
+	`culturalAct` varchar(50) NOT NULL,
 	`rating` int NOT NULL,
 	foreign key(`person`)
 		references `person`(`uri`)
 		on delete cascade
 		on update cascade,
-	foreign key(`cultural_act`)
-		references `cultural_act`(`name`)
+	foreign key(`culturalAct`)
+		references `culturalAct`(`name`)
 		on delete cascade
 		on update cascade,
-	primary key(`person`, `cultural_act`)
+	primary key(`person`, `culturalAct`)
 );

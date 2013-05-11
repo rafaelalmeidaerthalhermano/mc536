@@ -10,8 +10,7 @@ var Band = function (params) {
     this.categories = params.categories;
 
     this.save = function (cb) {
-        var locationCreated = false,
-            similarsCreated = true,
+        var similarsCreated = false,
             musiciansCreated = false,
             categoriesCreated = false;
 
@@ -20,6 +19,7 @@ var Band = function (params) {
                     if(country)
                         self.country = country.name;
                     else self.country = null;
+
                     self.createBand(function () {
                         self.createSimilars(function () {
                             similarsCreated = true;
@@ -59,7 +59,7 @@ var Band = function (params) {
 
     this.createCulturalAct = function (cb) {
         db(
-            'INSERT INTO `cultural_act` SET ?',
+            'INSERT INTO `culturalAct` SET ?',
             {
                 'name'     : self.name,
             },
@@ -70,13 +70,15 @@ var Band = function (params) {
     };
 
     this.createCountry = function (cb) {
-        require('./country').find(self.country, function (country) {
-            if(country)
-                country.save(function () {
-                    cb(country);
-                });
-            else cb(null);
-        });
+        if(self.country){
+            require('./country').find(self.country, function (country) {
+                if(country)
+                    country.save(function () {
+                        cb(country);
+                    });
+                else cb(null);
+            });
+        } else cb(null);
     };
 
     this.createSimilar = function (band, cb) {
@@ -93,16 +95,18 @@ var Band = function (params) {
     };
 
     this.createSimilars = function (cb) {
-        var handled = 0;
+        if(self.similars) {
+            var handled = 0;
 
-        for (var i in self.similars) {
-            self.createSimilars(self.similars[i], function () {
-                handled++;
-                if (handled >= self.similars.length) {
-                    cb(self.similars);
-                }
-            });
-        }
+            for (var i in self.similars) {
+                self.createSimilar(self.similars[i], function () {
+                    handled++;
+                    if (handled >= self.similars.length) {
+                        cb(self.similars);
+                    }
+                });
+            }
+        } else cb(null);
     };
 
     this.createCategory = function (category, cb) {
@@ -119,16 +123,18 @@ var Band = function (params) {
     };
 
     this.createCategories = function (cb) {
-        var handled = 0;
+        if(self.categories){
+            var handled = 0;
 
-        for (var i in self.categories) {
-            self.createCategory(self.categories[i], function () {
-                handled++;
-                if (handled >= self.categories.length) {
-                    cb(self.categories);
-                }
-            });
-        }
+            for (var i in self.categories) {
+                self.createCategory(self.categories[i], function () {
+                    handled++;
+                    if (handled >= self.categories.length) {
+                        cb(self.categories);
+                    }
+                });
+            }
+        } else cb(null);
     };
 
     this.createMusician = function (musician, cb) {
@@ -145,16 +151,18 @@ var Band = function (params) {
     };
 
     this.createMusicians = function (cb) {
-        var handled = 0;
+        if(self.musicians){
+            var handled = 0;
 
-        for (var i in self.musicians) {
-            self.createMusician(self.musicians[i], function () {
-                handled++;
-                if (handled >= self.musicians.length) {
-                    cb(self.musicians);
-                }
-            });
-        }
+            for (var i in self.musicians) {
+                self.createMusician(self.musicians[i], function () {
+                    handled++;
+                    if (handled >= self.musicians.length) {
+                        cb(self.musicians);
+                    }
+                });
+            }
+        } else cb(null);
     };
 };
 
@@ -177,15 +185,13 @@ Band.find = function (name, cb) {
                     }
                 }
 
-                var Similar = require('./similar'),
-                    similars = [],
+                var similars = [],
                     tempSimilars = lastFMBand.similar;
                 
                 if(tempSimilars) {          
                     for(var i in tempSimilars.artist) {
-                        similars.push(new Similar ({
-                            band   : lastFMBand.name,
-                            similar: tempSimilars.artist[i].name
+                        similars.push(new Band ({
+                            name   : tempSimilars.artist[i].name
                         }));
                     }
                 }
@@ -216,49 +222,11 @@ Band.find = function (name, cb) {
                         country    : place
                     });
 
-                //console.log(band);
                 cb(band)
             }
             else console.log("Banda Nao Encontrada!" + name);
         }
     );
-
-
-    //TODO implementar as chamadas pro music brainz e lastfm
-
-    /*
-    criar objeto banda para retornar no callback
-
-    var band = new Band ({
-        name      : '',
-        locations : [
-            new new require('./location') ({
-                name   : '',
-                type   : '',
-                parent : ''
-            })
-            ...
-        ],
-        musicians : [
-            new new require('./musician') ({
-                name   : ''
-            })
-            ...
-        ],
-        categories : [
-            new new require('./category') ({
-                name   : ''
-            })
-            ...
-        ],
-        relateds : [
-            new new require('./band') (...)
-            ...
-        ]
-    });
-
-    cb(band)
-    */
 };
 
 module.exports = Band;

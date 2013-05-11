@@ -18,10 +18,14 @@ var Country = function (params) {
     };
 };
 
-Country.find = function (name, cb) {
+Country.find = function (name, cb, param) {
     if (name) {
+        var url;
+        if(param)
+            url = "http://api.geonames.org/search?username=augustomorgan&maxRows=1&type=json&q=" + param + name;
+        else url = "http://api.geonames.org/search?username=augustomorgan&maxRows=1&type=json&q=" + name;
         require('./get')(
-            "http://api.geonames.org/search?username=augustomorgan&maxRows=1&type=json&q=" + name,
+            url,
             function (places) {
                 places = places.geonames[0];
                 if (places) {

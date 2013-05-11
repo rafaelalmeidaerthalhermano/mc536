@@ -8,7 +8,8 @@ var City = function (params) {
 
     this.save = function (cb) {
         self.createCountry(function (country) {
-            self.country = country.name;
+            if(country)
+                self.country = country.name;
             db(
                 'INSERT INTO `city` SET ?',
                 {
@@ -26,11 +27,15 @@ var City = function (params) {
 
     this.createCountry = function(cb) {
         require('./country').find(self.country, function (country) {
-            country.save(function () {
-                if (cb) {
-                    cb(country);
-                }
-            });
+            if(country) {
+                country.save(function () {
+                    if (cb) {
+                        cb(country);
+                    }
+                });
+            } else {
+                cb(null);
+            }  
         });
     };
 };
@@ -45,7 +50,6 @@ City.find = function (name, cb) {
                         name : places.name,
                         country : places.countryName
                     });
-
                 if (cb) {
                     cb(city);
                 }
