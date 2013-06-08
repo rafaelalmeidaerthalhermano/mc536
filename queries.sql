@@ -14,7 +14,7 @@ select similar as AtoMusical, count(*) as Similares from similar where similar n
 select location, count(*) as Quantidade from band where location is not NULL group by location order by Quantidade desc limit 15;
 
 -- lista as pessoa e o desvio padrao de suas notas para dizer o quao seletivas elas sao
-select person Pessoa, count(*) AtosCurtidos, std(rating) DesvioPadrao from `like` group by person order by AtosCurtidos, DesvioPadrao desc;
+select person Pessoa, count(*) AtosCurtidos, std(rating) DesvioPadrao from `like` group by person order by AtosCurtidos, DesvioPadrao desc limit 20;
 
 -- lista quantas pessoa da rede cada cidade possui
 select hometown Cidade, count(*) Pessoas from person group by hometown order by Pessoas desc;
@@ -24,7 +24,7 @@ select m1.name Ato1, m2.name Ato2, count(*) EstilosEmComum
 from band m1, band m2, style g1, style g2
 where m1.name = g1.culturalAct and m2.name = g2.culturalAct and g1.category = g2.category and m1.name <> m2.name
 group by m1.name, m2.name
-order by EstilosEmComum desc limit 30;
+order by EstilosEmComum desc limit 20;
 
 -- seleciona, entre os atos musicais curtidos, os que mais tem estilos musicais em comum
 create view atosCurtidos as (
@@ -35,7 +35,7 @@ select m1.culturalAct Ato1, m2.culturalAct Ato2, count(*) EstilosEmComum
 from atosCurtidos m1, atosCurtidos m2, style g1, style g2
 where m1.culturalAct = g1.culturalAct and m2.culturalAct = g2.culturalAct and g1.category = g2.category and m1.culturalAct <> m2.culturalAct
 group by m1.culturalAct, m2.culturalAct
-order by EstilosEmComum desc limit 50;
+order by EstilosEmComum desc limit 20;
 
 -- seleciona os diretores que tem mais filmes curtidos
 select director, count(*) Filmes from direct group by director order by Filmes desc limit 15;

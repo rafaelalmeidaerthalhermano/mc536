@@ -1,0 +1,417 @@
+ -- Lista os 15 estilos musicais mais comuns e quantos atos musicais eles possuem
+ select category as EstiloMusical, count(*) Quantidade from style where culturalAct in (select name from band) group by category order by count(*) desc limit 15;
+
++------------------+------------+
+| EstiloMusical    | Quantidade |
++------------------+------------+
+| rock             |        175 |
+| alternative      |         81 |
+| metal            |         60 |
+| classic rock     |         53 |
+| pop              |         45 |
+| female vocalists |         44 |
+| hard rock        |         44 |
+| indie            |         41 |
+| heavy metal      |         40 |
+| brazilian        |         39 |
+| punk             |         37 |
+| alternative rock |         36 |
+| electronic       |         34 |
+| 80s              |         28 |
+| brasil           |         27 |
++------------------+------------+
+15 rows in set (0.01 sec)
+
+ 
+ -- os generos de filmes e quantos filmes eles possuem
+ select category as EstiloCinematográfico, count(*) Quantidade from style where culturalAct in (select name from movie) group by category order by count(*) desc limit 15;
+
++------------------------+------------+
+| EstiloCinematográfico  | Quantidade |
++------------------------+------------+
+| Drama                  |         74 |
+| Adventure              |         41 |
+| Thriller               |         37 |
+| Crime                  |         35 |
+| Action                 |         32 |
+| Fantasy                |         24 |
+| Sci-Fi                 |         22 |
+| Mystery                |         20 |
+| Comedy                 |         17 |
+| War                    |         15 |
+| Family                 |         13 |
+| Animation              |         13 |
+| Biography              |         12 |
+| Romance                |          8 |
+| History                |          8 |
++------------------------+------------+
+15 rows in set (0.00 sec)
+
+ 
+ -- lista os atos musicais que mais tem outros atos similares que foram curtidos por alguem da rede
+ select similar as AtoMusical, count(*) as Similares from similar group by similar order by Similares desc limit 20;
+
++--------------------------+-----------+
+| AtoMusical               | Similares |
++--------------------------+-----------+
+| Black Sabbath            |         7 |
+| Slayer                   |         6 |
+| Nicky Romero             |         6 |
+| Exodus                   |         6 |
+| Ultraje a Rigor          |         5 |
+| Alesso                   |         5 |
+| Gamma Ray                |         5 |
+| Iron Maiden              |         5 |
+| Arctic Monkeys           |         5 |
+| The Strokes              |         5 |
+| Judas Priest             |         5 |
+| Miley Cyrus              |         5 |
+| The Doors                |         5 |
+| Selena Gomez & the Scene |         5 |
+| Led Zeppelin             |         5 |
+| Anthrax                  |         4 |
+| Whitesnake               |         4 |
+| Andrew Rayel             |         4 |
+| Pantera                  |         4 |
+| Barão Vermelho           |         4 |
++--------------------------+-----------+
+20 rows in set (0.01 sec)
+
+ 
+ -- similar ao anterior, mas que não foram curtidos por ninguem
+ select similar as AtoMusical, count(*) as Similares from similar where similar not in (select culturalAct from `like`) group by similar order by Similares desc limit 20;
+
++--------------------------+-----------+
+| AtoMusical               | Similares |
++--------------------------+-----------+
+| Black Sabbath            |         7 |
+| Exodus                   |         6 |
+| Slayer                   |         6 |
+| Nicky Romero             |         6 |
+| Iron Maiden              |         5 |
+| Alesso                   |         5 |
+| Selena Gomez & the Scene |         5 |
+| Miley Cyrus              |         5 |
+| Gamma Ray                |         5 |
+| Ultraje a Rigor          |         5 |
+| Led Zeppelin             |         5 |
+| The Doors                |         5 |
+| Barão Vermelho           |         4 |
+| Pantera                  |         4 |
+| Gal Costa                |         4 |
+| Within Temptation        |         4 |
+| Raimundos                |         4 |
+| Cream                    |         4 |
+| Franz Joseph Haydn       |         4 |
+| Soundgarden              |         4 |
++--------------------------+-----------+
+20 rows in set (0.01 sec)
+
+ 
+ -- lista os paises e quantos atos musicais eles possuem
+ select location, count(*) as Quantidade from band where location is not NULL group by location order by Quantidade desc limit 15;
+
++----------------+------------+
+| location       | Quantidade |
++----------------+------------+
+| United States  |        258 |
+| United Kingdom |         82 |
+| Brazil         |         53 |
+| Germany        |         25 |
+| Canada         |         23 |
+| Finland        |         21 |
+| Japan          |         18 |
+| Sweden         |         16 |
+| France         |         12 |
+| Ireland        |         12 |
+| Netherlands    |         11 |
+| Australia      |         10 |
+| Norway         |          5 |
+| Italy          |          5 |
+| Spain          |          4 |
++----------------+------------+
+15 rows in set (0.00 sec)
+
+ 
+ -- lista as pessoa e o desvio padrao de suas notas para dizer o quao seletivas elas sao
+ select person Pessoa, count(*) AtosCurtidos, std(rating) DesvioPadrao from `like` group by person order by DesvioPadrao desc, AtosCurtidos desc limit 20;
+
++-------------------+--------------+--------------+
+| Pessoa            | AtosCurtidos | DesvioPadrao |
++-------------------+--------------+--------------+
+| andrevasconcellos |           11 |       1.3727 |
+| augustomorgan     |           51 |       1.3408 |
+| brunocarvalho     |           49 |       1.2187 |
+| andreborba        |           36 |       1.1742 |
+| pedroalves        |           28 |       1.1249 |
+| alexandremedeiros |           34 |       1.0588 |
+| viniciusana       |           33 |       1.0374 |
+| renanfujii        |           19 |       0.9931 |
+| felipeoliveira    |           22 |       0.9674 |
+| guilhermeplatzeck |           14 |       0.9583 |
+| fabiosartorato    |           44 |       0.9145 |
+| ivanfreitas       |           70 |       0.8968 |
+| leonardoana       |           16 |       0.8817 |
+| marcelofabri      |           19 |       0.8616 |
+| marcelozabani     |           21 |       0.8438 |
+| arthuralvarez     |           27 |       0.8315 |
+| lucaslima         |           39 |       0.7828 |
+| matheusboy        |           42 |       0.7711 |
+| fernandomassunari |           19 |       0.7663 |
+| mariasousa        |            6 |       0.7454 |
++-------------------+--------------+--------------+
+20 rows in set (0.00 sec)
+
+ 
+ -- lista quantas pessoa da rede cada cidade possui
+ select hometown Cidade, count(*) Pessoas from person group by hometown order by Pessoas desc;
++-------------------------+---------+
+| Cidade                  | Pessoas |
++-------------------------+---------+
+| Campinas                |      20 |
+| NULL                    |      12 |
+| São Paulo               |       4 |
+| Vinhedo                 |       2 |
+| Rondonópolis            |       1 |
+| Pirangi                 |       1 |
+| Natal                   |       1 |
+| Fortaleza               |       1 |
+| Araraquara              |       1 |
+| São José dos Campos     |       1 |
+| Rio de Janeiro          |       1 |
+| Passos                  |       1 |
+| Mogi das Cruzes         |       1 |
+| Andradina               |       1 |
+| Tangará da Serra        |       1 |
+| São José do Rio Pardo   |       1 |
+| Ribeirão Preto          |       1 |
+| Niterói                 |       1 |
+| Mariana                 |       1 |
+| Belém                   |       1 |
++-------------------------+---------+
+20 rows in set (0.00 sec)
+
+ 
+ -- seleciona os atos musicais que mais tem estilos musicais em comum
+ select m1.name Ato1, m2.name Ato2, count(*) EstilosEmComum
+    from band m1, band m2, style g1, style g2
+    where m1.name = g1.culturalAct and m2.name = g2.culturalAct and g1.category = g2.category and m1.name <> m2.name
+    group by m1.name, m2.name
+    order by EstilosEmComum desc limit 20;
++---------------------+--------------------+----------------+
+| Ato1                | Ato2               | EstilosEmComum |
++---------------------+--------------------+----------------+
+| Jota Quest          | Skank              |              5 |
+| Green Day           | blink-182          |              5 |
+| Goo Goo Dolls       | Third Eye Blind    |              5 |
+| Ozzy Osbourne       | Black Sabbath      |              5 |
+| Kiss                | Queen              |              5 |
+| The Killers         | Weezer             |              5 |
+| The White Stripes   | The Killers        |              5 |
+| May'n               | Angela             |              5 |
+| Creed               | Audioslave         |              5 |
+| Audioslave          | Foo Fighters       |              5 |
+| Weezer              | The White Stripes  |              5 |
+| Stone Temple Pilots | Pearl Jam          |              5 |
+| AC/DC               | Ozzy Osbourne      |              5 |
+| Alice in Chains     | Foo Fighters       |              5 |
+| Foo Fighters        | Alice in Chains    |              5 |
+| Chico Buarque       | Vinicius de Moraes |              5 |
+| Damn Yankees        | Mr. Big            |              5 |
+| Black Sabbath       | Ozzy Osbourne      |              5 |
+| Damn Yankees        | Bon Jovi           |              5 |
+| Audioslave          | Alice in Chains    |              5 |
++---------------------+--------------------+----------------+
+20 rows in set (0.24 sec)
+
+ 
+ -- seleciona, entre os atos musicais curtidos, os que mais tem estilos musicais em comum
+ 
+ select m1.culturalAct Ato1, m2.culturalAct Ato2, count(*) EstilosEmComum
+    from atosCurtidos m1, atosCurtidos m2, style g1, style g2
+    where m1.culturalAct = g1.culturalAct and m2.culturalAct = g2.culturalAct and g1.category = g2.category and m1.culturalAct <> m2.culturalAct
+    group by m1.culturalAct, m2.culturalAct
+    order by EstilosEmComum desc limit 20;
++-----------------+-----------------+----------------+
+| Ato1            | Ato2            | EstilosEmComum |
++-----------------+-----------------+----------------+
+| Sum 41          | Blink-182       |              5 |
+| Weezer          | The Strokes     |              5 |
+| Creed           | Audioslave      |              5 |
+| The Strokes     | Weezer          |              5 |
+| Foo Fighters    | Creed           |              5 |
+| Alice in Chains | Foo Fighters    |              5 |
+| Goo goo dolls   | Matchbox Twenty |              5 |
+| Mr. Big         | Bon Jovi        |              5 |
+| Foo Fighters    | Alice in Chains |              5 |
+| Blink-182       | Sum 41          |              5 |
+| Talking heads   | The cure        |              5 |
+| Creed           | Foo Fighters    |              5 |
+| Audioslave      | Foo Fighters    |              5 |
+| Alice in Chains | Creed           |              5 |
+| Kiss            | Queen           |              5 |
+| Queen           | Kiss            |              5 |
+| Weezer          | The Killers     |              5 |
+| Audioslave      | Creed           |              5 |
+| Bon Jovi        | Mr. Big         |              5 |
+| Foo Fighters    | Audioslave      |              5 |
++-----------------+-----------------+----------------+
+20 rows in set (0.08 sec)
+
+ 
+ -- seleciona os diretores que tem mais filmes curtidos
+ select director, count(*) Filmes from direct group by director order by Filmes desc limit 15;
++----------------------+--------+
+| director             | Filmes |
++----------------------+--------+
+| Christopher Nolan    |      6 |
+| Steven Spielberg     |      6 |
+| Quentin Tarantino    |      5 |
+| Stanley Kubrick      |      5 |
+| Clint Eastwood       |      4 |
+| Peter Jackson        |      4 |
+| Akira Kurosawa       |      4 |
+| Martin Scorsese      |      4 |
+| Sergio Leone         |      4 |
+| Hayao Miyazaki       |      3 |
+| James Cameron        |      3 |
+| Ridley Scott         |      3 |
+| Francis Ford Coppola |      3 |
+| Danny Boyle          |      2 |
+| Robert Zemeckis      |      2 |
++----------------------+--------+
+15 rows in set (0.00 sec)
+
+ 
+ -- seleciona os diretores mais bem avaliados
+ select d.director, avg(l.rating) Media, count(*) Curtidas from
+    `like` l, direct d where d.movie = l.culturalAct group by director order by Curtidas desc, Media desc limit 20;
++----------------------+--------+----------+
+| director             | Media  | Curtidas |
++----------------------+--------+----------+
+| Christopher Nolan    | 4.1111 |       81 |
+| Peter Jackson        | 4.5429 |       70 |
+| Quentin Tarantino    | 4.2069 |       58 |
+| David Fincher        | 4.2647 |       34 |
+| Steven Spielberg     | 4.0000 |       33 |
+| Ridley Scott         | 4.0357 |       28 |
+| Robert Zemeckis      | 4.0800 |       25 |
+| Andy Wachowski       | 4.3750 |       24 |
+| Lana Wachowski       | 4.3750 |       24 |
+| Stanley Kubrick      | 3.8500 |       20 |
+| Lee Unkrich          | 4.3158 |       19 |
+| Francis Ford Coppola | 4.5294 |       17 |
+| Martin Scorsese      | 3.6875 |       16 |
+| Frank Darabont       | 4.5714 |       14 |
+| Andrew Stanton       | 3.8571 |       14 |
+| James McTeigue       | 4.5385 |       13 |
+| Gore Verbinski       | 4.1538 |       13 |
+| Rob Minkoff          | 4.5833 |       12 |
+| Roger Allers         | 4.5833 |       12 |
+| Irvin Kershner       | 4.2500 |       12 |
++----------------------+--------+----------+
+20 rows in set (0.00 sec)
+
+ 
+ 
+ -- atores que mais tem filmes
+ select actor, count(*) Filmes from act group by actor order by Filmes desc limit 15;
++-------------------+--------+
+| actor             | Filmes |
++-------------------+--------+
+| Robert De Niro    |      6 |
+| Clint Eastwood    |      6 |
+| Harrison Ford     |      6 |
+| Brad Pitt         |      5 |
+| Bruce Willis      |      5 |
+| Tom Hanks         |      5 |
+| Ian McKellen      |      4 |
+| Christian Bale    |      4 |
+| Leonardo DiCaprio |      4 |
+| Morgan Freeman    |      4 |
+| Orlando Bloom     |      4 |
+| Michael Caine     |      3 |
+| Al Pacino         |      3 |
+| Natalie Portman   |      3 |
+| Mark Hamill       |      3 |
++-------------------+--------+
+15 rows in set (0.00 sec)
+
+ 
+ -- atores mais bem avaliados
+ select a.actor, avg(l.rating) Media, count(*) Curtidas from
+    `like` l, act a where a.movie = l.culturalAct group by actor order by Curtidas desc, Media desc limit 20;
++----------------------+--------+----------+
+| actor                | Media  | Curtidas |
++----------------------+--------+----------+
+| Orlando Bloom        | 4.5000 |       72 |
+| Ian McKellen         | 4.5429 |       70 |
+| Elijah Wood          | 4.5763 |       59 |
+| Brad Pitt            | 4.1818 |       55 |
+| Tom Hanks            | 4.1600 |       50 |
+| Leonardo DiCaprio    | 4.1200 |       50 |
+| Christian Bale       | 4.0204 |       49 |
+| Viggo Mortensen      | 4.6250 |       40 |
+| Harrison Ford        | 4.2000 |       40 |
+| Michael Caine        | 4.0513 |       39 |
+| Hugo Weaving         | 4.4324 |       37 |
+| Ken Watanabe         | 3.9730 |       37 |
+| Carrie-Anne Moss     | 4.4194 |       31 |
+| Mark Hamill          | 4.3226 |       31 |
+| Carrie Fisher        | 4.3226 |       31 |
+| Bruce Willis         | 4.2759 |       29 |
+| Edward Norton        | 4.3571 |       28 |
+| Helena Bonham Carter | 4.4444 |       27 |
+| Uma Thurman          | 4.1852 |       27 |
+| Meat Loaf            | 4.4400 |       25 |
++----------------------+--------+----------+
+20 rows in set (0.02 sec)
+
+ 
+ -- musicos em mais bandas
+ select musician, count(*) Bandas from participate group by musician order by Bandas desc limit 10;
++------------------+--------+
+| musician         | Bandas |
++------------------+--------+
+| Marco Hietala    |      2 |
+| Mick Jones       |      2 |
+| Dez Cadena       |      2 |
+| Brad Wilk        |      2 |
+| Guy Picciotto    |      2 |
+| Mike Portnoy     |      2 |
+| Tom Morello      |      2 |
+| Tim Commerford   |      2 |
+| Paul Simonon     |      2 |
+| James MacDonough |      2 |
++------------------+--------+
+10 rows in set (0.00 sec)
+
+ 
+ -- musicos mais bem avaliados
+ select p.musician, avg(l.rating) Media, count(*) Curtidas from
+    `like` l, participate p where p.band = l.culturalAct group by p.musician order by Curtidas desc, Media desc limit 20;
++------------------+--------+----------+
+| musician         | Media  | Curtidas |
++------------------+--------+----------+
+| Bob Klose        | 4.6667 |       18 |
+| Roger Waters     | 4.6667 |       18 |
+| Rick Wright      | 4.6667 |       18 |
+| Nick Mason       | 4.6667 |       18 |
+| David Gilmour    | 4.6667 |       18 |
+| Syd Barrett      | 4.6667 |       18 |
+| James Hetfield   | 4.6000 |       15 |
+| Robert Trujillo  | 4.6000 |       15 |
+| Lars Ulrich      | 4.6000 |       15 |
+| Kirk Hammett     | 4.6000 |       15 |
+| John Lennon      | 4.6000 |       10 |
+| Stuart Sutcliffe | 4.6000 |       10 |
+| George Harrison  | 4.6000 |       10 |
+| Ringo Starr      | 4.6000 |       10 |
+| Pete Best        | 4.6000 |       10 |
+| Paul McCartney   | 4.6000 |       10 |
+| Jack Irons       | 4.5000 |       10 |
+| John Deacon      | 4.4000 |       10 |
+| Freddie Mercury  | 4.4000 |       10 |
+| Brian May        | 4.4000 |       10 |
++------------------+--------+----------+
+20 rows in set (0.01 sec)

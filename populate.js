@@ -12,7 +12,7 @@ var open = function (file, cb) {
 }
 
 
-/*open('/pessoas.xml', function (persons) {
+open('/pessoas.xml', function (persons) {
     var handled = 0;
 
     for (var i in persons.Persons.Person) {
@@ -31,9 +31,7 @@ var open = function (file, cb) {
             }
         });
     }
-});*/
-
-CreateBands(mergeBands);
+});
 
 function CreateMovies(){
     var createMovie = function (movie_name, person, rating) {
@@ -64,8 +62,9 @@ function CreateMovies(){
     });
 }
 
-function CreateBands(){
-    var createBand = function (band_name, person, rating) {
+function CreateBands(cb){
+
+    var createBand = function (band_name, person, rating, cb) {
         require('./band').find(
             band_name,
             function (band) {
@@ -76,13 +75,15 @@ function CreateBands(){
                             culturalAct : band_name,
                             rating : rating
                         });
-                    like.save();
+                    like.save(cb);
                 });
             }
         );
     };
 
     open('/CurteMusica.xml', function (likesMusic) {
+        var handled = 0;
+
         for (var i in likesMusic.AllLikesMusic.LikesMusic) {
             var musicUri = likesMusic.AllLikesMusic.LikesMusic[i].$.bandUri.replace("http://en.wikipedia.org/wiki/", "");
             musicUri = musicUri.replace('%28', '(');
@@ -93,7 +94,13 @@ function CreateBands(){
             createBand(
                 musicUri,
                 likesMusic.AllLikesMusic.LikesMusic[i].$.person.replace("http://www.ic.unicamp.br/MC536/2013/1/",""),
-                likesMusic.AllLikesMusic.LikesMusic[i].$.rating
+                likesMusic.AllLikesMusic.LikesMusic[i].$.rating,
+                function(){
+                    handled++;
+                    if(handled >= likesMusic.AllLikesMusic.LikesMusic.length) {
+                        cb()
+                    }
+                }
             );            
         }
     });
@@ -126,7 +133,7 @@ function mergeBand (musicName) {
 }
 
 function mergeBands () {
-    require('./db')('SELECT name FROM band WHERE location IS NULL', {}, function (err, bands) {
+    require('./db')('SELECT name FROM band WHERE location IS NULL and name > "R"', {}, function (err, bands) {
         var i = 0;
         setInterval(function () {
             if(i < bands.length) {

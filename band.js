@@ -10,7 +10,7 @@ var Band = function (params) {
     this.categories = params.categories;
 
     this.save = function (cb) {
-        var similarsCreated = false,
+        var similarsCreated = true,
             musiciansCreated = false,
             categoriesCreated = false;
 
@@ -27,13 +27,13 @@ var Band = function (params) {
                                 cb();
                             }
                         });
-                        self.createMusicians(function () {
+                        self.createMusicians(function (err) {
                             musiciansCreated = true;
                             if (similarsCreated && musiciansCreated && categoriesCreated) {
                                 cb();
                             }
                         });
-                        self.createCategories(function () {
+                        self.createCategories(function (err) {
                             categoriesCreated = true;
                             if (similarsCreated && musiciansCreated && categoriesCreated) {
                                 cb();
@@ -95,7 +95,7 @@ var Band = function (params) {
     };
 
     this.createSimilars = function (cb) {
-        if(self.similars) {
+        if(self.similars && self.similars.length > 0) {
             var handled = 0;
 
             for (var i in self.similars) {
@@ -123,7 +123,7 @@ var Band = function (params) {
     };
 
     this.createCategories = function (cb) {
-        if(self.categories){
+        if(self.categories && self.categories.length > 0){
             var handled = 0;
 
             for (var i in self.categories) {
@@ -151,7 +151,7 @@ var Band = function (params) {
     };
 
     this.createMusicians = function (cb) {
-        if(self.musicians){
+        if(self.musicians && self.musicians.length > 0){
             var handled = 0;
 
             for (var i in self.musicians) {
@@ -162,7 +162,9 @@ var Band = function (params) {
                     }
                 });
             }
-        } else cb(null);
+        } else {
+            cb(null);
+        }
     };
 };
 
