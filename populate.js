@@ -133,7 +133,7 @@ function mergeBand (musicName) {
 }
 
 function mergeBands () {
-    require('./db')('SELECT name FROM band WHERE location IS NULL and name > "R"', {}, function (err, bands) {
+    require('./db')('SELECT name FROM band WHERE location IS NULL', {}, function (err, bands) {
         var i = 0;
         setInterval(function () {
             if(i < bands.length) {
