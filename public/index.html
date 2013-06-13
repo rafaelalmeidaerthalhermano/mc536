@@ -1,0 +1,241 @@
+<!doctype html>
+<html ng-app="recomend">
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+        <script type="text/javascript">
+            /*global angular */
+            
+            angular.module('recomend', []).config(function ($routeProvider) {
+            
+                $routeProvider.
+                /* Pagina inicial */
+                when('/', {
+                    templateUrl : '/views/login.tpl.html',
+                    controller : function ($rootScope, $scope, $http, $location) {
+                        
+                        $scope.login = function () {
+                            $location.path('/recomendar');
+                        };
+                        
+                    }
+                }).
+                /* pagina de recomendações */
+                when('/recomendacoes', {
+                    templateUrl : '/views/recomend.tpl.html',
+                    controller : function ($rootScope, $scope, $http, $location) {
+                    
+                        $scope.recomendations= {
+                            bands : [
+                                {
+                                    name : 'teste 1'
+                                },
+                                {
+                                    name : 'teste 2'
+                                },
+                                {
+                                    name : 'teste 3'
+                                }
+                            ],
+                            movies : [
+                                {
+                                    name : 'teste 1'
+                                },
+                                {
+                                    name : 'teste 2'
+                                },
+                                {
+                                    name : 'teste 3'
+                                }
+                            ],
+                            friends : [
+                                {
+                                    name : 'teste 1'
+                                },
+                                {
+                                    name : 'teste 2'
+                                },
+                                {
+                                    name : 'teste 3'
+                                }
+                            ]
+                        }
+                    
+                        $scope.like = function () {
+                            
+                        };
+                        
+                    }
+                }).
+                /* pagina de minhas musicas */
+                when('/bandas', {
+                    templateUrl : '/views/bands.tpl.html',
+                    controller : function ($rootScope, $scope, $http, $location) {
+                    
+                        $scope.likes = [
+                            {
+                                name : 'teste 1'
+                            },
+                            {
+                                name : 'teste 2'
+                            },
+                            {
+                                name : 'teste 3'
+                            }
+                        ];
+                    
+                        $scope.like = function () {
+                            
+                        };
+                        
+                        $scope.unlike = function (band) {
+                            
+                        };
+                    
+                    }
+                }).
+                /* pagina de meus filmes */
+                when('/filmes', {
+                    templateUrl : '/views/movies.tpl.html',
+                    controller : function ($rootScope, $scope, $http, $location) {
+                    
+                        $scope.likes = [
+                            {
+                                name : 'teste 1'
+                            },
+                            {
+                                name : 'teste 2'
+                            },
+                            {
+                                name : 'teste 3'
+                            }
+                        ];
+                    
+                        $scope.like = function () {
+                            
+                        };
+                        
+                        $scope.unlike = function (movie) {
+                            
+                        };
+                    
+                    }
+                }).
+                /* pagina de meus amigos */
+                when('/amigos', {
+                    templateUrl : '/views/friends.tpl.html',
+                    controller : function ($rootScope, $scope, $http, $location) {
+                    
+                        $scope.friends = [
+                            {
+                                name : 'teste 1'
+                            },
+                            {
+                                name : 'teste 2'
+                            },
+                            {
+                                name : 'teste 3'
+                            }
+                        ];
+                    
+                        $scope.know = function () {
+                            
+                        };
+                        
+                        $scope.unknow = function (friend) {
+                            
+                        };
+                    
+                    }
+                }).
+                /* pagina não encontrada */
+                otherwise({
+                    redirectTo: '/'
+                });
+            
+            });
+        </script>
+        <style>
+            body {
+                background-color: #eee;
+                margin: 0;
+                font-family: Verdana,Helvetica,sans-serif;
+            }
+            
+            .header {
+                padding: 40px 0 0 0;
+                margin: auto;
+                box-shadow: 0 0 200px rgba(0,0,0,0.4);
+                background-color: #fff;
+            }
+            
+            .header h1 {
+                margin: 20px 40px;
+                font-size: 25px;
+                font-family: Arial,Helvetica,sans-serif;
+                color: #3E4C59;
+            }
+            
+            .header ol.menu {
+                padding: 10px 0 0 40px;
+                font-family: Arial,Helvetica,sans-serif;
+                margin:0;
+                background-color: #EBEEEF;
+            }
+            
+            .header ol.menu li {
+                padding-bottom: 8px;
+                display: inline-block;
+                border-bottom: solid 5px #EBEEEF;
+                margin-right: 10px;
+                letter-spacing: 2px;
+                
+                transition: all 0.2s linear;
+                -webkit-transition: all 0.2s linear;
+                -moz-transition: all 0.2s linear;
+                -o-transition: all 0.2s linear;
+            }
+            
+            .header ol.menu li:hover {
+                border-bottom: solid 5px #131E2D;
+            }
+            
+            .header ol.menu li a {
+                color : #FF420A;
+                font-size: 15px;
+                text-decoration : none;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>
+                sistema de recomendações
+            </h1>
+            <ol class="menu">
+                <li>
+                    <a href="#/recomendacoes">
+                        recomendações
+                    </a>
+                </li>
+                <li>
+                    <a href="#/amigos">
+                        meus amigos
+                    </a>
+                </li>
+                <li>
+                    <a href="#/filmes">
+                        meus amigos
+                    </a>
+                </li>
+                <li>
+                    <a href="#/musicas">
+                        meus amigos
+                    </a>
+                </li>
+            </ol>
+        </div>
+        <div ng-view>
+            
+        </div>
+    </body>
+</html>

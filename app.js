@@ -2,9 +2,32 @@ var express = require('express'),
     app = new express(),
     model = require('./model');
 
+
+
+/* Configurando o server */
+app.configure(function () {
+    "use strict";
+    app.use(express.static(__dirname + '/public'));
+
+    app.use(express.bodyParser());
+    app.use(express.methodOverride());
+    app.use(app.router);
+
+    app.use(function(error, request, response, next) {
+        if (error) {
+            response.send({error : error});
+        } else {
+            next();
+        }
+    });
+});
+
+app.get('/', function (request, response) {
+    response.sendfile('public/index.html');
+});
+
 /* Pessoas */
 app.post("/person", function (request, response) {
-
     var person = new model.Person({
         uri      : request.param('uri'),
         name     : request.param('name'),
@@ -103,4 +126,4 @@ app.del("/person/:id/bands/:like_id", function (request, response) {
     response.send(null);
 });
 
-app.listen(8080);
+app.listen(process.env.PORT);
