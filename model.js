@@ -3,10 +3,10 @@
  */
 var mysql = require('mysql'),
     connection = mysql.createConnection({
-      host     : 'localhost',
-      user     : 'root',
-      password : 'Aim3eif7',
-      database : 'social',
+      host     : 'sql2.lab.ic.unicamp.br',
+      user     : 'mc536user29',
+      password : 'iephoiha',
+      database : 'mc536db29',
     }),
     http = require('http');
 
@@ -31,10 +31,10 @@ function Get (url , cb) {
             response += data;
         });
         httpResponse.on('end', function () {
-            cb(JSON.parse(response.toString()))
+            cb(JSON.parse(response.toString()));
         });
     });
-};
+}
 
 /*------------------------------------------------------------------------------
  * Entidade país
@@ -72,36 +72,24 @@ var Country = function (params) {
  * @param name
  * @param cb
  */
-Country.find = function (name, cb, param) {
+Country.find = function (name, cb) {
     if (name) {
-        var url;
-
-        if(param) {
-            url = 'http://api.geonames.org/search?' +
-                  'username=augustomorgan&' +
-                  'maxRows=1' +
-                  '&type=json' +
-                  '&q=' + param + name;
-        } else {
-            url = 'http://api.geonames.org/search?' +
-                  'username=augustomorgan' +
-                  '&maxRows=1' +
-                  '&type=json' +
-                  '&q=' + name;
-        }
+        var url = 'http://dev.virtualearth.net/REST/v1/Locations/' + name + '?' +
+                  'output=json&' +
+                  'key=Ap7rxE2Zsd4JrfEpq17pREQ6u6SjmQVPWwu3-BjSXJeGzwQYE641aiGxU25B_8TQ'
 
         Get(
             url,
-            function (places) {
+            function (data) {
                 var country;
 
-                places = places.geonames[0];
-                if (!places) {
+                var place = data.resourceSets[0].resources[0].name;
+                if (!place) {
                     return cb(null);
                 }
 
                 country = new Country ({
-                    name : places.countryName
+                    name : place
                 });
 
                 if (cb) {
@@ -182,26 +170,26 @@ var City = function (params) {
  */
 City.find = function (name, cb) {
     if (name) {
-        Get(
-            'http://api.geonames.org/search?' +
-            'username=augustomorgan' +
-            '&maxRows=1' +
-            '&type=json' +
-            '&q=' + name,
-            function (places) {
-                var city;
-
-                places = places.geonames[0];
+        var url = 'http://dev.virtualearth.net/REST/v1/Locations/' + name + ' br?' +
+                  'output=json&' +
+                  'key=Ap7rxE2Zsd4JrfEpq17pREQ6u6SjmQVPWwu3-BjSXJeGzwQYE641aiGxU25B_8TQ'
+        
+         Get(
+            url,
+            function (data) {
+                var city ;
+                data = data.resourceSets[0].resources[0].name; 
+                data = data.replace(/[/,]+[a-zA-Z]*/ , '');
                 city = new City({
-                    name : places.name,
-                    country : places.countryName
+                    name : data,
+                    country : 'Brasil'
                 });
 
                 if (cb) {
                     cb(city);
                 }
             }
-        );
+        ); 
     } else if (cb) {
         cb(null);
     }
@@ -1117,7 +1105,9 @@ Band.find = function (name, cb) {
 
                 cb(band)
             }
-            else console.log("Banda Nao Encontrada!" + name);
+            else {
+                console.log("Banda Nao Encontrada!" + name);
+            }
         }
     );
 };
@@ -1155,6 +1145,26 @@ var Know = function (params) {
             }
         );
     };
+
+    /*
+     * Remove entidade do banco de dados
+     *
+     * @param cb
+     */
+    this.remove = function (cb) {
+        db(
+            'DELETE FROM `know` WHERE ?',
+            {
+                'person' : self.person,
+                'colleague': self.colleague
+            },
+            function () {
+                if (cb) {
+                    cb(self);
+                }
+            }
+        );
+    };
 };
 
 exports.Know = Know;
@@ -1179,12 +1189,83 @@ var Like = function (params) {
      * @param cb
      */
     this.save = function (cb) {
+        if (this.culturalAct.indexOf('http://en.wikipedia.org/wiki/') > -1) {
+            this.culturalAct = this.culturalAct.replace('http://en.wikipedia.org/wiki/', '');
+            this.createBand(function (band) {
+                self.culturalAct = band.name;
+                self.createLike(cb);
+            });
+        } else {
+            this.culturalAct = this.culturalAct.replace("http://www.imdb.com/title/", "").replace("/", "");
+            this.createMovie(function (movie) {
+                self.culturalAct = movie.name;
+                self.createLike(cb);
+            });
+        }
+    };
+    
+    /*
+     * Cria o like no banco de dados
+     *
+     * @param cb
+     */
+    this.createLike = function (cb) {
         db(
             'INSERT INTO `like` SET ?',
             {
                 'person' : self.person,
                 'culturalAct': self.culturalAct,
                 'rating' : self.rating
+            },
+            function () {
+                if (cb) {
+                    cb(self);
+                }
+            }
+        );
+    };
+    
+    /*
+     * Insere a banda no banco de dados
+     *
+     * @param cb
+     */
+    this.createBand = function (cb) {
+        Band.find(self.culturalAct, function (band) {
+            band.save(function () {
+                if (cb) {
+                    cb(band);
+                }
+            });
+        });
+    };
+    
+    /*
+     * Insere o filme no banco de dados
+     *
+     * @param cb
+     */
+    this.createMovie = function (cb) {
+        Movie.find(self.culturalAct, function (movie) {
+            movie.save(function () {
+                if (cb) {
+                    cb(movie);
+                }
+            });
+        });
+    };
+    
+    /*
+     * Remove entidade do banco de dados
+     *
+     * @param cb
+     */
+    this.remove = function (cb) {
+        db(
+            'DELETE FROM `like` WHERE ?',
+            {
+                'person' : self.person,
+                'culturalAct': self.culturalAct
             },
             function () {
                 if (cb) {
@@ -1258,7 +1339,61 @@ var Person = function (params) {
                 cb(city);
             }
         });
-    }
+    };
+};
+
+Person.find = function (id, cb) {
+    db(
+        'SELECT * FROM `person` WHERE `uri` = "' + id + '"', {}, function (persons) {
+            var person = new Person({
+                    name : persons[0].name,
+                    uri : persons[0].uri,
+                    hometown : persons[0].hometown
+                }),
+                knowsHandled = false,
+                bandsHandled = false,
+                moviesHandled = false;
+            
+            person.knows = [];
+            person.likes = {
+                bands  : [],
+                movies : []
+            };
+            
+            /* Pegando os amigos */
+            db('SELECT `know`.`colleague` FROM `know` WHERE `know`.`person` = "' + id + '"', {}, function (knows) {
+                for (var i in knows) {
+                    person.knows.push(new Know(knows[i]));
+                }
+                knowsHandled = true;
+                if (knowsHandled && bandsHandled && moviesHandled) {
+                    cb(person);
+                }
+            });
+            
+            /* Pegando as musicas curtidas */
+            db('SELECT `like`.`culturalAct` FROM `like`, `band` WHERE `like`.`person` = "' + id + '" AND `band`.`name` = `like`.`culturalAct`', {}, function (likes) {
+                for (var i in likes) {
+                    person.likes.bands.push(new Like(likes[i]));
+                }
+                bandsHandled = true;
+                if (knowsHandled && bandsHandled && moviesHandled) {
+                    cb(person);
+                }
+            });
+            
+            /* Pegando os filmes curtidos curtidas */
+            db('SELECT `like`.`culturalAct` FROM `like`, `movie` WHERE `like`.`person` = "' + id + '" AND `movie`.`name` = `like`.`culturalAct`', {}, function (likes) {
+                for (var i in likes) {
+                    person.likes.movies.push(new Like(likes[i]));
+                }
+                moviesHandled = true;
+                if (knowsHandled && bandsHandled && moviesHandled) {
+                    cb(person);
+                }
+            });
+        }
+    );
 };
 
 exports.Person = Person;
