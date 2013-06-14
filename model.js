@@ -73,10 +73,12 @@ var Country = function (params) {
  * @param cb
  */
 Country.find = function (name, cb) {
+
     if (name) {
         var url = 'http://dev.virtualearth.net/REST/v1/Locations/' + name + '?' +
                   'output=json&' +
                   'key=Ap7rxE2Zsd4JrfEpq17pREQ6u6SjmQVPWwu3-BjSXJeGzwQYE641aiGxU25B_8TQ'
+
 
         Get(
             url,
@@ -178,8 +180,7 @@ City.find = function (name, cb) {
             url,
             function (data) {
                 var city ;
-                console.log(name)
-                console.log(data)
+
                 data = data.resourceSets[0].resources[0].name; 
                 data = data.replace(/[/,]+[a-zA-Z]*/ , '');
                 city = new City({
@@ -647,7 +648,11 @@ Movie.find = function (name, cb) {
     Get(
         "http://www.omdbapi.com/?i=" + name,
         function (tempMovie) {
+
             var directors = [],
+                tempDirectors = [];
+
+            if(tempMovie.Director)
                 tempDirectors = tempMovie.Director.split(', ');
 
             for(var i in tempDirectors) {
@@ -657,6 +662,9 @@ Movie.find = function (name, cb) {
             }
 
             var actors = [],
+                tempActors = [];
+
+            if(tempMovie.Actors)
                 tempActors = tempMovie.Actors.split(', ');
             
             for(var i in tempActors) {
@@ -666,6 +674,9 @@ Movie.find = function (name, cb) {
             }
 
             var categories = [],
+                tempCategories = [];
+            
+            if(tempMovie.Genre)
                 tempCategories = tempMovie.Genre.split(', ');
             
             for(var i in tempCategories) {
@@ -1103,8 +1114,8 @@ Band.find = function (name, cb) {
                     cb(band);
                 } else {
                     Get("http://musicbrainz.org/ws/2/artist?limit=1&fmt=json&query="+name, function (MusicBrainz) {
-                        if(music && music.artist && music.artist[0] && music.artist[0].country) {
-                            band.country = music.artist[0].country;
+                        if(MusicBrainz && MusicBrainz.artist && MusicBrainz.artist[0] && MusicBrainz.artist[0].country) {
+                            band.country = MusicBrainz.artist[0].country;
                         }
                         cb(band);
                     });
@@ -1265,7 +1276,6 @@ var Like = function (params) {
      * @param cb
      */
     this.remove = function (cb) {
-        console.log('DELETE FROM `like` WHERE person = "'+self.person+'" AND culturalAct = "'+self.culturalAct+'"')
         db(
             'DELETE FROM `like` WHERE person = "'+self.person+'" AND culturalAct = "'+self.culturalAct+'"',
             {},

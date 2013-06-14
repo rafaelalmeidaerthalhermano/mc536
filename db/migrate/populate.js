@@ -15,28 +15,35 @@ var model = require('../../model');
 
 
 
-
+/*
 open('/pessoas.xml', function (persons) {
-    var handled = 0;
+    var i = 0;
 
-    for (var i in persons.Persons.Person) {
-        var person = new model.Person ({
-                uri : persons.Persons.Person[i].$.uri.replace("http://www.ic.unicamp.br/MC536/2013/1/",""),
-                name : persons.Persons.Person[i].$.name,
-                hometown : persons.Persons.Person[i].$.hometown
-            });
-        person.save(function () {
-            handled++;
-            if(handled >= persons.Persons.Person.length){
-                Dump();
-            }
+    function save(person, cb) {
+        var persona = new model.Person ({
+            uri : person.uri.replace("http://www.ic.unicamp.br/MC536/2013/1/",""),
+            name : person.name,
+            hometown : person.hometown
         });
+        persona.save(cb);
     }
-});
 
+    function next() {
+        if (i < persons.Persons.Person.length) {
+            save(persons.Persons.Person[i].$, next);
+            console.log("Pessoa "+i+" inserida...")
+            i++;
+        } else {
+            Dump();
+        }
+    }
+    
+    next();
+});*/
+Dump();
 
 function Dump(){
-    open('/Conhece.xml', function (knows) {
+    /*open('/Conhece.xml', function (knows) {
         for (var i in knows.AllKnows.Knows) {
             var know = new model.Know({
                     person : knows.AllKnows.Knows[i].$.person.replace("http://www.ic.unicamp.br/MC536/2013/1/",""),
@@ -46,8 +53,8 @@ function Dump(){
                 console.log(know);
             });
         }
-    });
-
+    });*/
+/*
     open('/CurteFilme.xml', function (likesMovies) {
         for (var i in likesMovies.AllLikesMovie.LikesMovie) {
             var like = new model.Like({
@@ -56,22 +63,34 @@ function Dump(){
                 rating : likesMovies.AllLikesMovie.LikesMovie[i].$.rating
             });
             like.save(function () {
-                console.log(like);
+                //console.log(like);
             });
         }
-    });
+    });*/
 
+    
     open('/CurteMusica.xml', function (likesMusic) {
-        for (var i in likesMusic.AllLikesMusic.LikesMusic) {
-            var like = new model.Like({
-                culturalAct : likesMusic.AllLikesMusic.LikesMusic[i].$.bandUri,
-                person : likesMusic.AllLikesMusic.LikesMusic[i].$.person.replace("http://www.ic.unicamp.br/MC536/2013/1/",""),
-                rating : likesMusic.AllLikesMusic.LikesMusic[i].$.rating
+        var i = 0;
+
+        function save(like, cb) {
+            var newLike = new model.Like ({
+                person : like.person.replace("http://www.ic.unicamp.br/MC536/2013/1/",""),
+                culturalAct : like.bandUri.replace(/[\((\%28)]+[A-Za-z0-9\s\-]*[\)(\%29)]+/, ''),
+                rating : like.rating
             });
-            like.save(function () {
-                console.log(like);
-            });           
+            newLike.save(cb);
         }
+
+        function next() {
+            if (i < likesMusic.AllLikesMusic.LikesMusic.length) {
+                save(likesMusic.AllLikesMusic.LikesMusic[i].$, next);
+                console.log("Curtir Musica "+i+" inserida...")
+                i++;
+            }
+        }
+        
+        next();
+
     });
 }
 
