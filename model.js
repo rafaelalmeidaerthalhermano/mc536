@@ -178,13 +178,14 @@ City.find = function (name, cb) {
             url,
             function (data) {
                 var city ;
+                console.log(name)
+                console.log(data)
                 data = data.resourceSets[0].resources[0].name; 
                 data = data.replace(/[/,]+[a-zA-Z]*/ , '');
                 city = new City({
                     name : data,
                     country : 'Brasil'
                 });
-
                 if (cb) {
                     cb(city);
                 }
@@ -1089,23 +1090,26 @@ Band.find = function (name, cb) {
                     }
                 }
 
-                var place = null;
-                if(lastFMBand.bio){
-                    if(lastFMBand.bio.placeformed)
-                        place = lastFMBand.bio.placeformed;
-                }
-
                 var band = new Band({
                     name       : lastFMBand.name,
                     similars   : similars,
                     musicians  : bandMembers,
                     categories : categories,
-                    country    : place
+                    country    : null
                 });
 
-                cb(band)
-            }
-            else {
+                if(lastFMBand.bio && lastFMBand.bio.placeformed){
+                    band.country = lastFMBand.bio.placeformed;
+                    cb(band);
+                } else {
+                    Get("http://musicbrainz.org/ws/2/artist?limit=1&fmt=json&query="+name, function (MusicBrainz) {
+                        if(music && music.artist && music.artist[0] && music.artist[0].country) {
+                            band.country = music.artist[0].country;
+                        }
+                        cb(band);
+                    });
+                }
+            } else {
                 console.log("Banda Nao Encontrada!" + name);
             }
         }
