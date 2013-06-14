@@ -42,6 +42,7 @@ app.post("/person", function (request, response) {
 function findPerson (request, response, next) {
     model.Person.find(request.params.id, function (person) {
         request.person = person;
+        next();
     });
 }
 
@@ -59,10 +60,6 @@ app.post("/person/:id/friends", findPerson, function (request, response) {
     know.save(function () {
         response.send({know : know});
     });
-});
-
-app.get("/person/:id/friends/recomend", function (request, response) {
-    /* Integrar com as maluquices do augusto */
 });
 
 app.del("/person/:id/friends/:friend_id", findPerson, function (request, response) {
@@ -87,10 +84,6 @@ app.post("/person/:id/movies", function (request, response) {
     });
 });
 
-app.get("/person/:id/movies/recomend", function (request, response) {
-    /* Integrar com as maluquices do augusto */
-});
-
 app.del("/person/:id/movies/:like_id", findPerson, function (request, response) {
     for (var i in request.person.likes.movies) {
         if (request.person.likes.movies[i].culturalAct === request.params.like_id) {
@@ -111,10 +104,6 @@ app.post("/person/:id/bands", function (request, response) {
     like.save(function () {
         response.send({like : like});
     });
-});
-
-app.get("/person/:id/bands/recomend", function (request, response) {
-    /* Integrar com as maluquices do augusto */
 });
 
 app.del("/person/:id/bands/:like_id", function (request, response) {
