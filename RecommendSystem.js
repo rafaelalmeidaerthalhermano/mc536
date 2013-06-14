@@ -522,9 +522,6 @@ function recommend(personUri, cb){
 }
 
 
-
-
-
 recommend("augustomorgan", function (){
 	recommend("jonatanvalongo", function () {
 		recommend("brunocarvalho", function () {
@@ -535,13 +532,3 @@ recommend("augustomorgan", function (){
 	})
 
 });
-
-
-/*
-
-// Bandas Similares
-		require('./db')(
-			'select s.similar recommend, count(*) numb from similar s where s.band in( select culturalAct from `like` where person = "'+personUri+'" ) AND s.similar not in( select culturalAct from `like` where person = "'+personUri+'" ) group by s.similar having count(*) > 1 order by numb desc limit 10',
-			{},
-			cb
-		);*/
