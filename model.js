@@ -1653,7 +1653,7 @@ var Person = function (params) {
         var query2 = function(cb){
             // regra de associacao de 2 atos
             db(
-                'select a.recommend, MAX(a.value) value from `like` l, AssociationAct2 a where l.person = "'+self.uri+'"   and l.culturalAct = a.act and a.recommend not in ( select p.culturalAct  from `like` p  where p.person = "'+self.uri+'" ) AND a.recommend in( select name from band ) group by a.recommend order by value desc',
+                'select a.recommend act, MAX(a.value) value from `like` l, AssociationAct2 a where l.person = "'+self.uri+'"   and l.culturalAct = a.act and a.recommend not in ( select p.culturalAct  from `like` p  where p.person = "'+self.uri+'" ) AND a.recommend in( select name from band ) group by a.recommend order by value desc',
                 {},
                 cb
             );
@@ -1662,7 +1662,7 @@ var Person = function (params) {
         var query3 = function(cb){
             // regra de associacao de 3 atos
             db(
-                'select a.recommend, MAX(a.value) value from `like` l1, `like` l2, AssociationAct3 a where l1.person = "'+self.uri+'" and l2.person = l1.person and l1.culturalAct = a.act1 and l2.culturalAct = a.act2 and a.recommend not in( select culturalAct from `like` where person = "'+self.uri+'" ) AND a.recommend in( select name from band ) group by a.recommend order by value desc',
+                'select a.recommend act, MAX(a.value) value from `like` l1, `like` l2, AssociationAct3 a where l1.person = "'+self.uri+'" and l2.person = l1.person and l1.culturalAct = a.act1 and l2.culturalAct = a.act2 and a.recommend not in( select culturalAct from `like` where person = "'+self.uri+'" ) AND a.recommend in( select name from band ) group by a.recommend order by value desc',
                 {},
                 cb
             );
@@ -1671,7 +1671,7 @@ var Person = function (params) {
         var query4 = function(cb){
             //Atos Musicais com generos em comum com os curtidos
             db(
-                'select c.act2 recommend, AVG(common) average, count(*) timesEqual, AVG(common)+0.08*count(*) value from common_genre c where c.act1 in ( select culturalAct from `like` where person = "'+self.uri+'" ) AND c.act2 not in ( select culturalAct from `like` where person = "'+self.uri+'" ) AND c.act2 in( select name from band ) group by c.act2 order by value desc',
+                'select c.act2 act, AVG(common) average, count(*) timesEqual, AVG(common)+0.08*count(*) value from common_genre c where c.act1 in ( select culturalAct from `like` where person = "'+self.uri+'" ) AND c.act2 not in ( select culturalAct from `like` where person = "'+self.uri+'" ) AND c.act2 in( select name from band ) group by c.act2 order by value desc',
                 {},
                 cb
             );
@@ -1680,7 +1680,7 @@ var Person = function (params) {
         var query5 = function(cb){
             //Atos Musicais similares aos curtidos
             db(
-                'select s.similar recommend, count(*) numb from similar s where s.band in( select culturalAct from `like` where person = "'+self.uri+'" ) AND s.similar not in( select culturalAct from `like` where person = "'+self.uri+'" ) group by s.similar order by numb desc',
+                'select s.similar act, count(*) numb from similar s where s.band in( select culturalAct from `like` where person = "'+self.uri+'" ) AND s.similar not in( select culturalAct from `like` where person = "'+self.uri+'" ) group by s.similar order by numb desc',
                 {},
                 cb
             );
@@ -1691,6 +1691,7 @@ var Person = function (params) {
             var results = {};
             var k;
 
+            console.log(set2)
             for(var i in set1) {
                 if(results[set1[i].act]){
                     results[set1[i].act] += 2*set1[i].value/set1[0].value;
@@ -1726,6 +1727,7 @@ var Person = function (params) {
                     results[set4[i].act] = set4[i].value/set4[0].value;
                 }
             }
+
 
             for(var i in set5) {
                 if(results[set5[i].act]){
