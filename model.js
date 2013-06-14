@@ -3,10 +3,10 @@
  */
 var mysql = require('mysql'),
     connection = mysql.createConnection({
-      host     : 'sql2.lab.ic.unicamp.br',
-      user     : 'mc536user29',
-      password : 'iephoiha',
-      database : 'mc536db29',
+      host     : 'localhost',
+      user     : 'root',
+      password : 'Aim3eif7',
+      database : 'social',
     }),
     http = require('http');
 
@@ -412,8 +412,8 @@ var Movie = function (params) {
 
     this.name = params.name;
     this.plot = params.plot;
-    this.IMDBrating = params.IMDBrating;
-    this.IMDBvotes = params.IMDBvotes;
+    this.IMDBrating = params.IMDBrating.replace("N/A", 0);
+    this.IMDBvotes = params.IMDBvotes.replace("N/A", 0);
     this.directors = params.directors;
     this.actors = params.actors;
     this.categories = params.categories;
@@ -1261,13 +1261,12 @@ var Like = function (params) {
      * @param cb
      */
     this.remove = function (cb) {
+        console.log('DELETE FROM `like` WHERE person = "'+self.person+'" AND culturalAct = "'+self.culturalAct+'"')
         db(
-            'DELETE FROM `like` WHERE ?',
-            {
-                'person' : self.person,
-                'culturalAct': self.culturalAct
-            },
-            function () {
+            'DELETE FROM `like` WHERE person = "'+self.person+'" AND culturalAct = "'+self.culturalAct+'"',
+            {},
+            function (err) {
+                console.log(err)
                 if (cb) {
                     cb(self);
                 }
@@ -1344,7 +1343,7 @@ var Person = function (params) {
 
 Person.find = function (id, cb) {
     db(
-        'SELECT * FROM `person` WHERE `uri` = "' + id + '"', {}, function (persons) {
+        'SELECT * FROM `person` WHERE `uri` = "' + id + '"', {}, function (err, persons) {
             var person = new Person({
                     name : persons[0].name,
                     uri : persons[0].uri,
@@ -1361,7 +1360,7 @@ Person.find = function (id, cb) {
             };
             
             /* Pegando os amigos */
-            db('SELECT `know`.`colleague` FROM `know` WHERE `know`.`person` = "' + id + '"', {}, function (knows) {
+            db('SELECT `know`.`colleague`, `know`.`person` FROM `know` WHERE `know`.`person` = "' + id + '"', {}, function (err, knows) {
                 for (var i in knows) {
                     person.knows.push(new Know(knows[i]));
                 }
@@ -1372,7 +1371,7 @@ Person.find = function (id, cb) {
             });
             
             /* Pegando as musicas curtidas */
-            db('SELECT `like`.`culturalAct` FROM `like`, `band` WHERE `like`.`person` = "' + id + '" AND `band`.`name` = `like`.`culturalAct`', {}, function (likes) {
+            db('SELECT `like`.`culturalAct`, `like`.`person` FROM `like`, `band` WHERE `like`.`person` = "' + id + '" AND `band`.`name` = `like`.`culturalAct`', {}, function (err, likes) {
                 for (var i in likes) {
                     person.likes.bands.push(new Like(likes[i]));
                 }
@@ -1383,7 +1382,7 @@ Person.find = function (id, cb) {
             });
             
             /* Pegando os filmes curtidos curtidas */
-            db('SELECT `like`.`culturalAct` FROM `like`, `movie` WHERE `like`.`person` = "' + id + '" AND `movie`.`name` = `like`.`culturalAct`', {}, function (likes) {
+            db('SELECT `like`.`culturalAct`, `like`.`person` FROM `like`, `movie` WHERE `like`.`person` = "' + id + '" AND `movie`.`name` = `like`.`culturalAct`', {}, function (err, likes) {
                 for (var i in likes) {
                     person.likes.movies.push(new Like(likes[i]));
                 }

@@ -126,4 +126,15 @@ app.del("/person/:id/bands/:like_id", function (request, response) {
     response.send(null);
 });
 
-app.listen(process.env.PORT);
+model.Person.find("augustomorgan", function (person) {
+    //console.log(JSON.stringify(person))
+    for(var i in person.likes.movies) {
+        if(person.likes.movies[i].culturalAct === "The Hobbit: The Desolation of Smaug"){
+            person.likes.movies[i].remove(function () {
+                console.log("Removido")
+            });
+        }
+    }
+})
+
+app.listen(process.env.PORT || 8080);
