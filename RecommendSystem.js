@@ -30,12 +30,11 @@ function refreshMaterializedViewAssociationAct3 (cb){
 	);
 }
 
-
-function recommendFriend (personUri, cb) {
+function recommendFriend (cb) {
 	var query1 = function(cb){
-		//Pessoas que conhecem personUri mas não são conhecidas por personUri
+		//Pessoas que conhecem self.uri mas não são conhecidas por self.uri
 		require('./db')(
-			'select a.person from know a where a.colleague = "'+personUri+'" and a.person not in( select colleague from know where person = "'+personUri+'")',
+			'select a.person from know a where a.colleague = "'+self.uri+'" and a.person not in( select colleague from know where person = "'+self.uri+'")',
 			{},
 			cb
 		);
@@ -44,7 +43,7 @@ function recommendFriend (personUri, cb) {
 	var query2 = function(cb){
 		//Regra de Associação para 2 pessoas (amigos de X também são amigos de Y)
 		require('./db')(
-			'SELECT a.recommend recommend, MAX(a.value) value FROM know k, linkPeopleView a WHERE k.person = "'+personUri+'" AND k.colleague = a.colleague AND a.recommend not in ( select p.colleague from know p WHERE p.person = "'+personUri+'")AND a.recommend <> "'+personUri+'" GROUP BY a.recommend ORDER BY value desc',
+			'SELECT a.recommend recommend, MAX(a.value) value FROM know k, linkPeopleView a WHERE k.person = "'+self.uri+'" AND k.colleague = a.colleague AND a.recommend not in ( select p.colleague from know p WHERE p.person = "'+self.uri+'")AND a.recommend <> "'+self.uri+'" GROUP BY a.recommend ORDER BY value desc',
 			{},
 			cb
 		);
@@ -53,7 +52,7 @@ function recommendFriend (personUri, cb) {
 	var query3 = function(cb){
 		//Pessoas com grupos de amigos em comum
 		require('./db')(
-			'select b.person, count(*) commonFriends from know a, know b where b.person not in( select colleague from know where person = "'+personUri+'" ) and a.colleague = b.colleague and a.person = "'+personUri+'" and a.person <> b.person group by b.person order by commonFriends desc',
+			'select b.person, count(*) commonFriends from know a, know b where b.person not in( select colleague from know where person = "'+self.uri+'" ) and a.colleague = b.colleague and a.person = "'+self.uri+'" and a.person <> b.person group by b.person order by commonFriends desc',
 			{},
 			cb
 		);
@@ -62,7 +61,7 @@ function recommendFriend (personUri, cb) {
 	var query4 = function(cb){
 		//Pessoas com gostos parecidos
 		require('./db')(
-			'select b.person, COUNT(*) commonLikes, sum(5-abs(a.rating-b.rating))/count(*) + 0.4*count(*) Value from `like` a, `like` b where a.person = "'+personUri+'" and b.person <> a.person and b.person not in( select colleague from know where person = "'+personUri+'" ) and a.culturalAct = b.culturalAct group by b.person order by Value desc, commonLikes desc',
+			'select b.person, COUNT(*) commonLikes, sum(5-abs(a.rating-b.rating))/count(*) + 0.4*count(*) Value from `like` a, `like` b where a.person = "'+self.uri+'" and b.person <> a.person and b.person not in( select colleague from know where person = "'+self.uri+'" ) and a.culturalAct = b.culturalAct group by b.person order by Value desc, commonLikes desc',
 			{},
 			cb
 		);
@@ -71,84 +70,72 @@ function recommendFriend (personUri, cb) {
 	var query5 = function(cb){
 		//Pessoas que os amigos conhecem
 		require('./db')(
-			'select b.colleague person, count(*) knownByFriends from know a, know b where a.person = "'+personUri+'" AND a.colleague = b.person AND b.colleague not in( select colleague from know where person = "'+personUri+'" ) AND b.colleague <> a.person group by b.colleague order by knownByFriends desc',
+			'select b.colleague person, count(*) knownByFriends from know a, know b where a.person = "'+self.uri+'" AND a.colleague = b.person AND b.colleague not in( select colleague from know where person = "'+self.uri+'" ) AND b.colleague <> a.person group by b.colleague order by knownByFriends desc',
 			{},
 			cb
 		);
 	};
 
 	var pickBetter = function (set1, set2, set3, set4, set5, cb) {
-		var results = { names : new Array(), values : new Array()};
-		var aux = new Array();
+		var results = {};
 		var k;
 
 		for(var i in set1) {
-			k = results.names.indexOf(set1[i].person)
-			if(k == -1){
-				results.names.push(set1[i].person)
-				results.values.push(2)
+			if(results[set1[i].person]){
+				results[set1[i].person] += 2;
 			}
 			else {
-				results.values[k] = results.values[k]+2
+				results[set1[i].person] = 2;
 			}
 		}
 
 		for(var i in set2) {
-			k = results.names.indexOf(set2[i].recommend)
-			if(k == -1){
-				results.names.push(set2[i].recommend)
-				results.values.push(set2[i].value)
+			if(results[set2[i].recommend]){
+				results[set2[i].recommend] += set2[i].value;
 			}
 			else {
-				results.values[k] = results.values[k]+set2[i].value
+				results[set2[i].recommend] = set2[i].value;
 			}
 		}
 
 		for(var i in set3) {
-			k = results.names.indexOf(set3[i].person)
-			if(k == -1){
-				results.names.push(set3[i].person)
-				results.values.push(set3[i].commonFriends/set3[0].commonFriends)
+			if(results[set3[i].person]){
+				results[set3[i].person] += set3[i].commonFriends/set3[0].commonFriends;
 			}
 			else {
-				results.values[k] = results.values[k]+set3[i].commonFriends/set3[0].commonFriends
+				results[set3[i].person] = set3[i].commonFriends/set3[0].commonFriends;
 			}
-		}	
+		}
 
 		for(var i in set4) {
-			k = results.names.indexOf(set4[i].person)
-			if(k == -1){
-				results.names.push(set4[i].person)
-				results.values.push(set4[i].commonLikes/set4[0].commonLikes)
+			if(results[set4[i].person]){
+				results[set4[i].person] += set4[i].commonLikes/set4[0].commonLikes;
 			}
 			else {
-				results.values[k] = results.values[k]+set4[i].commonLikes/set4[0].commonLikes
+				results[set4[i].person] = set4[i].commonLikes/set4[0].commonLikes;
 			}
 		}
 
 		for(var i in set5) {
-			k = results.names.indexOf(set5[i].person)
-			if(k == -1){
-				results.names.push(set5[i].person)
-				results.values.push(set5[i].knownByFriends/set5[0].knownByFriends)
+			if(results[set5[i].person]){
+				results[set5[i].person] += set5[i].knownByFriends/set5[0].knownByFriends;
 			}
 			else {
-				results.values[k] = results.values[k]+set5[i].knownByFriends/set5[0].knownByFriends
+				results[set5[i].person] = set5[i].knownByFriends/set5[0].knownByFriends;
 			}
 		}
-		
-		for(var i in results.names){
-			aux.push(
-				{
-					name : results.names[i],
-					value : results.values[i]
-				}
-			);
+
+		var set = [];
+		for (var i in results) {
+			set.push({
+				name : i,
+				value : results[i]
+			})
 		}
-		aux.sort(compareValue)
-		console.log(aux.slice(0,min(5, aux.length)))
+		set.sort(compareValue)
+
 		if(cb)
-			cb(personUri)
+			cb(set.slice(0,min(5, set.length)))
 	};
 
 	
@@ -191,11 +178,11 @@ function recommendFriend (personUri, cb) {
 	});
 }
 
-function recommendMovie (personUri, cb) {
+function recommendMovie (cb) {
 	var query1 = function(cb){
 		//filmes curtidos pelos amigos levando em consideracao as notas atribuidas
 		require('./db')(
-			' select l.culturalAct act, AVG(rating) averageRating, count(*) likedByFriends, AVG(rating)+0.5*count(*) value from `like` l, know k where k.person = "'+personUri+'" AND k.colleague = l.person AND l.culturalAct not in( select culturalAct from `like` where person = "'+personUri+'" ) AND l.culturalAct in( select name from movie ) group by l.culturalAct order by value desc',
+			' select l.culturalAct act, AVG(rating) averageRating, count(*) likedByFriends, AVG(rating)+0.5*count(*) value from `like` l, know k where k.person = "'+self.uri+'" AND k.colleague = l.person AND l.culturalAct not in( select culturalAct from `like` where person = "'+self.uri+'" ) AND l.culturalAct in( select name from movie ) group by l.culturalAct order by value desc',
 			{},
 			cb
 		);
@@ -204,7 +191,7 @@ function recommendMovie (personUri, cb) {
 	var query2 = function(cb){
 		// regra de associacao de 2 atos
 		require('./db')(
-			'select a.recommend, MAX(a.value) value from `like` l, AssociationAct2 a where l.person = "'+personUri+'"   and l.culturalAct = a.act and a.recommend not in ( select p.culturalAct  from `like` p  where p.person = "'+personUri+'" ) AND a.recommend in( select name from movie ) group by a.recommend order by value desc',
+			'select a.recommend, MAX(a.value) value from `like` l, AssociationAct2 a where l.person = "'+self.uri+'"   and l.culturalAct = a.act and a.recommend not in ( select p.culturalAct  from `like` p  where p.person = "'+self.uri+'" ) AND a.recommend in( select name from movie ) group by a.recommend order by value desc',
 			{},
 			cb
 		);
@@ -213,7 +200,7 @@ function recommendMovie (personUri, cb) {
 	var query3 = function(cb){
 		// regra de associacao de 3 atos
 		require('./db')(
-			'select a.recommend, MAX(a.value) value from `like` l1, `like` l2, AssociationAct3 a where l1.person = "'+personUri+'" and l2.person = l1.person and l1.culturalAct = a.act1 and l2.culturalAct = a.act2 and a.recommend not in( select culturalAct from `like` where person = "'+personUri+'" ) AND a.recommend in( select name from movie ) group by a.recommend order by value desc',
+			'select a.recommend, MAX(a.value) value from `like` l1, `like` l2, AssociationAct3 a where l1.person = "'+self.uri+'" and l2.person = l1.person and l1.culturalAct = a.act1 and l2.culturalAct = a.act2 and a.recommend not in( select culturalAct from `like` where person = "'+self.uri+'" ) AND a.recommend in( select name from movie ) group by a.recommend order by value desc',
 			{},
 			cb
 		);
@@ -222,7 +209,7 @@ function recommendMovie (personUri, cb) {
 	var query4 = function(cb){
 		//filmes com generos em comum com os curtidos
 		require('./db')(
-			'select c.act2 recommend, AVG(common) average, count(*) timesEqual, AVG(common)+0.08*count(*) value from common_genre c where c.act1 in ( select culturalAct from `like` where person = "'+personUri+'" ) AND c.act2 not in ( select culturalAct from `like` where person = "'+personUri+'" ) AND c.act2 in( select name from movie ) group by c.act2 order by value desc',
+			'select c.act2 recommend, AVG(common) average, count(*) timesEqual, AVG(common)+0.08*count(*) value from common_genre c where c.act1 in ( select culturalAct from `like` where person = "'+self.uri+'" ) AND c.act2 not in ( select culturalAct from `like` where person = "'+self.uri+'" ) AND c.act2 in( select name from movie ) group by c.act2 order by value desc',
 			{},
 			cb
 		);
@@ -230,66 +217,56 @@ function recommendMovie (personUri, cb) {
 
 
 	var pickBetter = function (set1, set2, set3, set4, cb) {
-		var results = { names : new Array(), values : new Array()};
-		var aux = new Array();
+		var results = {};
 		var k;
 
 		for(var i in set1) {
-			k = results.names.indexOf(set1[i].act)
-			if(k == -1){
-				results.names.push(set1[i].act)
-				results.values.push(2*set1[i].value/set1[0].value)
+			if(results[set1[i].act]){
+				results[set1[i].act] += 2*set1[i].value/set1[0].value;
 			}
 			else {
-				results.values[k] = results.values[k]+2*set1[i].value/set1[0].value
+				results[set1[i].act] = 2*set1[i].value/set1[0].value;
 			}
 		}
 
 		for(var i in set2) {
-			k = results.names.indexOf(set2[i].recommend)
-			if(k == -1){
-				results.names.push(set2[i].recommend)
-				results.values.push(3*set2[i].value/set2[0].value)
+			if(results[set2[i].recommend]){
+				results[set2[i].recommend] += 3*set2[i].value/set2[0].value;
 			}
 			else {
-				results.values[k] = results.values[k]+3*set2[i].value/set2[0].value
+				results[set2[i].recommend] = 3*set2[i].value/set2[0].value;
 			}
 		}
 
 		for(var i in set3) {
-			k = results.names.indexOf(set3[i].recommend)
-			if(k == -1){
-				results.names.push(set3[i].recommend)
-				results.values.push(3.5*set3[i].value/set3[0].value)
+			if(results[set3[i].recommend]){
+				results[set3[i].recommend] += 3.5*set3[i].value/set3[0].value;
 			}
 			else {
-				results.values[k] = results.values[k]+3.5*set3[i].value/set3[0].value
+				results[set3[i].recommend] = 3.5*set3[i].value/set3[0].value;
 			}
-		}	
+		}
 
 		for(var i in set4) {
-			k = results.names.indexOf(set4[i].recommend)
-			if(k == -1){
-				results.names.push(set4[i].recommend)
-				results.values.push(set4[i].value/set4[0].value)
+			if(results[set4[i].recommend]){
+				results[set4[i].recommend] += set4[i].value/set4[0].value;
 			}
 			else {
-				results.values[k] = results.values[k]+set4[i].value/set4[0].value
+				results[set4[i].recommend] = set4[i].value/set4[0].value;
 			}
 		}
 
-		for(var i in results.names){
-			aux.push(
-				{
-					name : results.names[i],
-					value : results.values[i]
-				}
-			);
+		var set = [];
+		for (var i in results) {
+			set.push({
+				name : i,
+				value : results[i]
+			})
 		}
-		aux.sort(compareValue)
-		console.log(aux.slice(0,min(10, aux.length)))
+		set.sort(compareValue)
+
 		if(cb)
-			cb(personUri)
+			cb(set.slice(0,min(5, set.length)))
 	};
 
 	
@@ -327,11 +304,11 @@ function recommendMovie (personUri, cb) {
 }
 
 
-function recommendBand (personUri, cb) {
+function recommendBand (cb) {
 	var query1 = function(cb){
 		//Bandas curtidas pelos amigos levando em consideracao as notas atribuidas
 		require('./db')(
-			' select l.culturalAct act, AVG(rating) averageRating, count(*) likedByFriends, AVG(rating)+0.5*count(*) value from `like` l, know k where k.person = "'+personUri+'" AND k.colleague = l.person AND l.culturalAct not in( select culturalAct from `like` where person = "'+personUri+'" ) AND l.culturalAct in( select name from band ) group by l.culturalAct order by value desc',
+			' select l.culturalAct act, AVG(rating) averageRating, count(*) likedByFriends, AVG(rating)+0.5*count(*) value from `like` l, know k where k.person = "'+self.uri+'" AND k.colleague = l.person AND l.culturalAct not in( select culturalAct from `like` where person = "'+self.uri+'" ) AND l.culturalAct in( select name from band ) group by l.culturalAct order by value desc',
 			{},
 			cb
 		);
@@ -340,7 +317,7 @@ function recommendBand (personUri, cb) {
 	var query2 = function(cb){
 		// regra de associacao de 2 atos
 		require('./db')(
-			'select a.recommend, MAX(a.value) value from `like` l, AssociationAct2 a where l.person = "'+personUri+'"   and l.culturalAct = a.act and a.recommend not in ( select p.culturalAct  from `like` p  where p.person = "'+personUri+'" ) AND a.recommend in( select name from band ) group by a.recommend order by value desc',
+			'select a.recommend, MAX(a.value) value from `like` l, AssociationAct2 a where l.person = "'+self.uri+'"   and l.culturalAct = a.act and a.recommend not in ( select p.culturalAct  from `like` p  where p.person = "'+self.uri+'" ) AND a.recommend in( select name from band ) group by a.recommend order by value desc',
 			{},
 			cb
 		);
@@ -349,7 +326,7 @@ function recommendBand (personUri, cb) {
 	var query3 = function(cb){
 		// regra de associacao de 3 atos
 		require('./db')(
-			'select a.recommend, MAX(a.value) value from `like` l1, `like` l2, AssociationAct3 a where l1.person = "'+personUri+'" and l2.person = l1.person and l1.culturalAct = a.act1 and l2.culturalAct = a.act2 and a.recommend not in( select culturalAct from `like` where person = "'+personUri+'" ) AND a.recommend in( select name from band ) group by a.recommend order by value desc',
+			'select a.recommend, MAX(a.value) value from `like` l1, `like` l2, AssociationAct3 a where l1.person = "'+self.uri+'" and l2.person = l1.person and l1.culturalAct = a.act1 and l2.culturalAct = a.act2 and a.recommend not in( select culturalAct from `like` where person = "'+self.uri+'" ) AND a.recommend in( select name from band ) group by a.recommend order by value desc',
 			{},
 			cb
 		);
@@ -358,7 +335,7 @@ function recommendBand (personUri, cb) {
 	var query4 = function(cb){
 		//Atos Musicais com generos em comum com os curtidos
 		require('./db')(
-			'select c.act2 recommend, AVG(common) average, count(*) timesEqual, AVG(common)+0.08*count(*) value from common_genre c where c.act1 in ( select culturalAct from `like` where person = "'+personUri+'" ) AND c.act2 not in ( select culturalAct from `like` where person = "'+personUri+'" ) AND c.act2 in( select name from band ) group by c.act2 order by value desc',
+			'select c.act2 recommend, AVG(common) average, count(*) timesEqual, AVG(common)+0.08*count(*) value from common_genre c where c.act1 in ( select culturalAct from `like` where person = "'+self.uri+'" ) AND c.act2 not in ( select culturalAct from `like` where person = "'+self.uri+'" ) AND c.act2 in( select name from band ) group by c.act2 order by value desc',
 			{},
 			cb
 		);
@@ -367,7 +344,7 @@ function recommendBand (personUri, cb) {
 	var query5 = function(cb){
 		//Atos Musicais similares aos curtidos
 		require('./db')(
-			'select s.similar recommend, count(*) numb from similar s where s.band in( select culturalAct from `like` where person = "'+personUri+'" ) AND s.similar not in( select culturalAct from `like` where person = "'+personUri+'" ) group by s.similar order by numb desc',
+			'select s.similar recommend, count(*) numb from similar s where s.band in( select culturalAct from `like` where person = "'+self.uri+'" ) AND s.similar not in( select culturalAct from `like` where person = "'+self.uri+'" ) group by s.similar order by numb desc',
 			{},
 			cb
 		);
@@ -375,78 +352,65 @@ function recommendBand (personUri, cb) {
 
 
 	var pickBetter = function (set1, set2, set3, set4, set5, cb) {
-		var results = { names : new Array(), values : new Array()};
-		var aux = new Array();
+		var results = {};
 		var k;
 
 		for(var i in set1) {
-			k = results.names.indexOf(set1[i].act)
-			if(k == -1){
-				results.names.push(set1[i].act)
-				results.values.push(2*set1[i].value/set1[0].value)
+			if(results[set1[i].act]){
+				results[set1[i].act] += 2*set1[i].value/set1[0].value;
 			}
 			else {
-				results.values[k] = results.values[k]+2*set1[i].value/set1[0].value
+				results[set1[i].act] = 2*set1[i].value/set1[0].value;
 			}
 		}
 
 		for(var i in set2) {
-			k = results.names.indexOf(set2[i].recommend)
-			if(k == -1){
-				results.names.push(set2[i].recommend)
-				results.values.push(3*set2[i].value/set2[0].value)
+			if(results[set2[i].act]){
+				results[set2[i].act] += 3*set2[i].value/set2[0].value;
 			}
 			else {
-				results.values[k] = results.values[k]+3*set2[i].value/set2[0].value
+				results[set2[i].act] = 3*set2[i].value/set2[0].value;
 			}
 		}
 
 		for(var i in set3) {
-			k = results.names.indexOf(set3[i].recommend)
-			if(k == -1){
-				results.names.push(set3[i].recommend)
-				results.values.push(3.5*set3[i].value/set3[0].value)
+			if(results[set3[i].act]){
+				results[set3[i].act] += 3.5*set3[i].value/set3[0].value;
 			}
 			else {
-				results.values[k] = results.values[k]+3.5*set3[i].value/set3[0].value
+				results[set3[i].act] = 3.5*set3[i].value/set3[0].value;
 			}
-		}	
+		}
 
 		for(var i in set4) {
-			k = results.names.indexOf(set4[i].recommend)
-			if(k == -1){
-				results.names.push(set4[i].recommend)
-				results.values.push(set4[i].value/set4[0].value)
+			if(results[set4[i].act]){
+				results[set4[i].act] += set4[i].value/set4[0].value;
 			}
 			else {
-				results.values[k] = results.values[k]+set4[i].value/set4[0].value
+				results[set4[i].act] = set4[i].value/set4[0].value;
 			}
 		}
-
 
 		for(var i in set5) {
-			k = results.names.indexOf(set5[i].recommend)
-			if(k == -1){
-				results.names.push(set5[i].recommend)
-				results.values.push(set5[i].numb/set5[0].numb)
+			if(results[set5[i].act]){
+				results[set5[i].act] += set5[i].numb/set5[0].numb;
 			}
 			else {
-				results.values[k] = results.values[k]+set5[i].numb/set5[0].numb
+				results[set5[i].act] = set5[i].numb/set5[0].numb;
 			}
 		}
 
-		for(var i in results.names){
-			aux.push(
-				{
-					name : results.names[i],
-					value : results.values[i]
-				}
-			);
+		var set = [];
+		for (var i in results) {
+			set.push({
+				name : i,
+				value : results[i]
+			})
 		}
-		aux.sort(compareValue)
-		console.log(aux.slice(0,min(10, aux.length)))
+		set.sort(compareValue)
+
 		if(cb)
-			cb(personUri)
+			cb(set.slice(0,min(5, set.length)))
 	};
 
 	
@@ -490,45 +454,3 @@ function recommendBand (personUri, cb) {
 
 }
 
-function recommend(personUri, cb){
-	personUri = personUri.replace("drop", "");
-	require('./db')(
-		'SELECT name FROM person WHERE uri = "'+personUri+'"',
-		{},
-		function (err, person_set){
-			if(person_set[0] == undefined)
-				console.log(personUri+" nao consta na base de dados!")
-			else {
-				console.log("")
-				console.log("Amigos para "+personUri+":")
-				recommendFriend(personUri, function() {
-					console.log("")
-					console.log("Fimes para "+personUri+":")
-					recommendMovie(personUri, function() {
-						console.log("")
-						console.log("Atos Musicais para "+personUri+":")
-						recommendBand(personUri, function(){
-							console.log("")
-							if(cb)
-								cb(personUri)
-						})
-						
-					});
-				});
-				
-			}
-		}
-	);
-}
-
-
-recommend("augustomorgan", function (){
-	recommend("jonatanvalongo", function () {
-		recommend("brunocarvalho", function () {
-			recommend("rafaelhermano", function (){
-				console.log("FIM")
-			})
-		})
-	})
-
-});
