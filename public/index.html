@@ -2,6 +2,7 @@
 <html ng-app="recomend">
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+        <link href='http://fonts.googleapis.com/css?family=Metamorphous' rel='stylesheet' type='text/css'>
         <script type="text/javascript">
             /*global angular */
             
@@ -156,38 +157,42 @@
         </script>
         <style>
             body {
-                background-color: #eee;
+                background-color: #000;
+                color: #EBEEEF;
                 margin: 0;
-                font-family: Verdana,Helvetica,sans-serif;
+                font-family: Arial;
+                font-size: 10px;
             }
             
             .header {
                 padding: 40px 0 0 0;
                 margin: auto;
-                box-shadow: 0 0 200px rgba(0,0,0,0.4);
-                background-color: #fff;
+                background-image: url('assets/banner.jpg');
+                background-size:100%;
+                background-repeat:no-repeat;
             }
             
             .header h1 {
-                margin: 20px 40px;
+                margin: 140px 0 0 0;
+                padding:10px 10px 10px 40px;
+                font-family: 'Metamorphous', cursive;
                 font-size: 25px;
-                font-family: Arial,Helvetica,sans-serif;
-                color: #3E4C59;
+                background-color: rgba(0, 0, 0, 0.5);
+                color: #FFF;
             }
             
             .header ol.menu {
-                padding: 10px 0 0 40px;
-                font-family: Arial,Helvetica,sans-serif;
+                padding: 5px 0 0 40px;
+                font-size: 12px;
+                
                 margin:0;
-                background-color: #EBEEEF;
+                background-color: rgba(0, 0, 0, 0.9);
             }
             
             .header ol.menu li {
-                padding-bottom: 8px;
                 display: inline-block;
-                border-bottom: solid 5px #EBEEEF;
+                border-bottom: solid 5px rgba(235, 238, 239, 0);
                 margin-right: 10px;
-                letter-spacing: 2px;
                 
                 transition: all 0.2s linear;
                 -webkit-transition: all 0.2s linear;
@@ -196,13 +201,16 @@
             }
             
             .header ol.menu li:hover {
-                border-bottom: solid 5px #131E2D;
+                border-bottom: solid 5px #FF420A;
             }
             
             .header ol.menu li a {
-                color : #FF420A;
-                font-size: 15px;
+                color: #EBEEEF;
                 text-decoration : none;
+            }
+            
+            .recomend {
+                
             }
         </style>
     </head>
@@ -224,18 +232,116 @@
                 </li>
                 <li>
                     <a href="#/filmes">
-                        meus amigos
+                        meus filmes
                     </a>
                 </li>
                 <li>
                     <a href="#/musicas">
-                        meus amigos
+                        minhas bandas
                     </a>
                 </li>
             </ol>
         </div>
-        <div ng-view>
-            
+        <div>
+            <ol>
+                <li class="recomend">
+                    <div class="title">
+                        bandas recomendadas
+                    </div>
+                    <ul>
+                        <li>
+                            <div>
+                                satisfaction
+                            </div>
+                            <div>
+                                curtir
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                sweet child
+                            </div>
+                            <div>
+                                curtir
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                shoot to thrill
+                            </div>
+                            <div>
+                                curtir
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ol>
+            <ol>
+                <li class="recomend">
+                    <div class="title">
+                        filmes recomendados
+                    </div>
+                    <ul>
+                        <li>
+                            <div>
+                                satisfaction
+                            </div>
+                            <div>
+                                curtir
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                sweet child
+                            </div>
+                            <div>
+                                curtir
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                shoot to thrill
+                            </div>
+                            <div>
+                                curtir
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ol>
+            <ol>
+                <li class="recomend">
+                    <div class="title">
+                        pessoas recomendadas
+                    </div>
+                    <ul>
+                        <li>
+                            <div>
+                                satisfaction
+                            </div>
+                            <div>
+                                curtir
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                sweet child
+                            </div>
+                            <div>
+                                curtir
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                shoot to thrill
+                            </div>
+                            <div>
+                                curtir
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ol>
         </div>
     </body>
 </html>
