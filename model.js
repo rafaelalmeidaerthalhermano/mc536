@@ -98,8 +98,17 @@ Country.find = function (name, cb) {
             url,
             function (data) {
                 var country;
-
+                
+                if (data.resourceSets[0].resources[0].entityType === 'CountryRegion' ){
                 var place = data.resourceSets[0].resources[0].name;
+                }
+                
+                else {
+                var place = data.resourceSets[0].resources[0].address.countryRegion;
+                
+                }    
+                console.log(place);
+                
                 if (!place) {
                     return cb(null);
                 }
@@ -196,7 +205,7 @@ City.find = function (name, cb) {
                 var city ;
 
                 data = data.resourceSets[0].resources[0].name; 
-                data = data.replace(/[/,]+[a-zA-Z]*/ , '');
+                data = data.replace(/[/,]+[a-zA-Z\s]*/ , '');
                 city = new City({
                     name : data,
                     country : 'Brasil'
