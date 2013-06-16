@@ -2,7 +2,6 @@
 <html ng-app="recomend">
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
-        <link href='http://fonts.googleapis.com/css?family=Metamorphous' rel='stylesheet' type='text/css'>
         <script type="text/javascript">
             /*global angular */
             
@@ -157,60 +156,87 @@
         </script>
         <style>
             body {
-                background-color: #000;
-                color: #EBEEEF;
                 margin: 0;
-                font-family: Arial;
-                font-size: 10px;
             }
             
             .header {
-                padding: 40px 0 0 0;
-                margin: auto;
-                background-image: url('assets/banner.jpg');
-                background-size:100%;
-                background-repeat:no-repeat;
+                padding: 20px 40px;
+                width: 800px;
+                margin: 50px auto;
+                background-color: black;
+                border-radius:10px;
             }
             
             .header h1 {
-                margin: 140px 0 0 0;
-                padding:10px 10px 10px 40px;
-                font-family: 'Metamorphous', cursive;
-                font-size: 25px;
-                background-color: rgba(0, 0, 0, 0.5);
-                color: #FFF;
+                color: #fff;
+                font-size:14px;
+            }
+            .header h2 {
+                color: #fff;
+                font-size:10px;
             }
             
-            .header ol.menu {
-                padding: 5px 0 0 40px;
-                font-size: 12px;
-                
+            .like { 
+                width: 840px;
+                margin: -30px auto;
+                padding:10px 20px;
+                border-radius:10px;
+                box-shadow: 0 0 40px rgba(0,0,0,0.4);
+                color:#999;
+            }
+            
+            .like input.filter { 
+                width:610px;
+                padding:5px 0;
+                border:none;
+                border-bottom:solid 1px #ccc;
+                background:none;
+                color:#ccc;
+                margin:0 25px 0 0;
+            }
+            
+            .like input.vote { 
+                background-image:-moz-linear-gradient(center top , #FEE94F 0px, #FD9A0F 100%);
+                border: solid 2px #FFAA22;
+                border-radius:4px 4px 4px 4px;
+                font-size: 13px;
+                font-weight: bold;
+                cursor:pointer;
+            }
+            
+            .musics {
+                padding: 20px 40px;
+                width: 800px;
+                margin: 50px auto;
+                border-radius:10px;
+            }
+            
+            .musics h3 {
+                font-size:12px;
+            }
+            
+            .musics ol {
+                list-style:none;
                 margin:0;
-                background-color: rgba(0, 0, 0, 0.9);
             }
             
-            .header ol.menu li {
-                display: inline-block;
-                border-bottom: solid 5px rgba(235, 238, 239, 0);
-                margin-right: 10px;
-                
-                transition: all 0.2s linear;
-                -webkit-transition: all 0.2s linear;
-                -moz-transition: all 0.2s linear;
-                -o-transition: all 0.2s linear;
+            .musics ol li.music {
+                margin:10px;
+                font-size:10px;
+                padding:10px 20px;
+                border-radius:10px;
+                box-shadow: 0 0 2px rgba(0,0,0,0.4);
             }
             
-            .header ol.menu li:hover {
-                border-bottom: solid 5px #FF420A;
-            }
-            
-            .header ol.menu li a {
-                color: #EBEEEF;
-                text-decoration : none;
-            }
-            
-            .recomend {
-                
+            .musics ol li.music .vote { 
+                background-image:-moz-linear-gradient(center top , #FEE94F 0px, #FD9A0F 100%);
+                border: solid 2px #FFAA22;
+                border-radius:40px;
+                font-size: 10px;
+                font-weight: bold;
+                padding: 2px;
+                margin-left:-10px;
+                margin-right:10px;
             }
         </style>
     </head>
@@ -219,127 +245,87 @@
             <h1>
                 sistema de recomendações
             </h1>
-            <ol class="menu">
-                <li>
-                    <a href="#/recomendacoes">
-                        recomendações
-                    </a>
-                </li>
-                <li>
-                    <a href="#/amigos">
-                        meus amigos
-                    </a>
-                </li>
-                <li>
-                    <a href="#/filmes">
-                        meus filmes
-                    </a>
-                </li>
-                <li>
-                    <a href="#/musicas">
-                        minhas bandas
-                    </a>
-                </li>
-            </ol>
+            <h2>
+                nos conte o que você curte e podemos te ajudar a conhecer novos filmes, musicas e amigos.
+            </h2>
         </div>
-        <div>
+        <div class="like">
+            <input type="text" class="filter" value="http://" />
+            <input type="submit" class="vote" value="+1" />
+            <input type="submit" class="vote" value="+2" />
+            <input type="submit" class="vote" value="+3" />
+            <input type="submit" class="vote" value="+4" />
+            <input type="submit" class="vote" value="+5" />
+        </div>
+        <div class="musics">
+            <h3>
+                as musicas que voce curte
+            </h3>
             <ol>
-                <li class="recomend">
-                    <div class="title">
-                        bandas recomendadas
-                    </div>
-                    <ul>
-                        <li>
-                            <div>
-                                satisfaction
-                            </div>
-                            <div>
-                                curtir
-                            </div>
-                        </li>
-                        <li>
-                            <div>
-                                sweet child
-                            </div>
-                            <div>
-                                curtir
-                            </div>
-                        </li>
-                        <li>
-                            <div>
-                                shoot to thrill
-                            </div>
-                            <div>
-                                curtir
-                            </div>
-                        </li>
-                    </ul>
+                <li class="music">
+                    <span class="vote">+3</span>
+                    Lynird Skynird
+                </li>
+                <li class="music">
+                    <span class="vote">+3</span>
+                    Lynird Skynird
+                </li>
+                <li class="music">
+                    <span class="vote">+3</span>
+                    Lynird Skynird
+                </li>
+                <li class="music">
+                    <span class="vote">+3</span>
+                    Lynird Skynird
+                </li>
+                <li class="music">
+                    <span class="vote">+3</span>
+                    Lynird Skynird
                 </li>
             </ol>
+            <h3>
+                o que recomendamos para você!
+            </h3>
             <ol>
-                <li class="recomend">
-                    <div class="title">
-                        filmes recomendados
-                    </div>
-                    <ul>
-                        <li>
-                            <div>
-                                satisfaction
-                            </div>
-                            <div>
-                                curtir
-                            </div>
-                        </li>
-                        <li>
-                            <div>
-                                sweet child
-                            </div>
-                            <div>
-                                curtir
-                            </div>
-                        </li>
-                        <li>
-                            <div>
-                                shoot to thrill
-                            </div>
-                            <div>
-                                curtir
-                            </div>
-                        </li>
-                    </ul>
+                <li class="music">
+                    <span class="vote">+1</span>
+                    <span class="vote">+2</span>
+                    <span class="vote">+3</span>
+                    <span class="vote">+4</span>
+                    <span class="vote">+5</span>
+                    Lynird Skynird
                 </li>
-            </ol>
-            <ol>
-                <li class="recomend">
-                    <div class="title">
-                        pessoas recomendadas
-                    </div>
-                    <ul>
-                        <li>
-                            <div>
-                                satisfaction
-                            </div>
-                            <div>
-                                curtir
-                            </div>
-                        </li>
-                        <li>
-                            <div>
-                                sweet child
-                            </div>
-                            <div>
-                                curtir
-                            </div>
-                        </li>
-                        <li>
-                            <div>
-                                shoot to thrill
-                            </div>
-                            <div>
-                                curtir
-                            </div>
-                        </li>
-                    </ul>
+                <li class="music">
+                    <span class="vote">+1</span>
+                    <span class="vote">+2</span>
+                    <span class="vote">+3</span>
+                    <span class="vote">+4</span>
+                    <span class="vote">+5</span>
+                    Lynird Skynird
+                </li>
+                <li class="music">
+                    <span class="vote">+1</span>
+                    <span class="vote">+2</span>
+                    <span class="vote">+3</span>
+                    <span class="vote">+4</span>
+                    <span class="vote">+5</span>
+                    Lynird Skynird
+                </li>
+                <li class="music">
+                    <span class="vote">+1</span>
+                    <span class="vote">+2</span>
+                    <span class="vote">+3</span>
+                    <span class="vote">+4</span>
+                    <span class="vote">+5</span>
+                    Lynird Skynird
+                </li>
+                <li class="music">
+                    <span class="vote">+1</span>
+                    <span class="vote">+2</span>
+                    <span class="vote">+3</span>
+                    <span class="vote">+4</span>
+                    <span class="vote">+5</span>
+                    Lynird Skynird
                 </li>
             </ol>
         </div>
