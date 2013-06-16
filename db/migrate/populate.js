@@ -15,7 +15,7 @@ var model = require('../../model');
 
 
 
-/*
+
 open('/pessoas.xml', function (persons) {
     var i = 0;
 
@@ -39,11 +39,10 @@ open('/pessoas.xml', function (persons) {
     }
     
     next();
-});*/
-Dump();
+});
 
 function Dump(){
-    /*open('/Conhece.xml', function (knows) {
+    open('/Conhece.xml', function (knows) {
         for (var i in knows.AllKnows.Knows) {
             var know = new model.Know({
                     person : knows.AllKnows.Knows[i].$.person.replace("http://www.ic.unicamp.br/MC536/2013/1/",""),
@@ -53,8 +52,8 @@ function Dump(){
                 console.log(know);
             });
         }
-    });*/
-/*
+    });
+
     open('/CurteFilme.xml', function (likesMovies) {
         for (var i in likesMovies.AllLikesMovie.LikesMovie) {
             var like = new model.Like({
@@ -66,7 +65,7 @@ function Dump(){
                 //console.log(like);
             });
         }
-    });*/
+    });
 
     
     open('/CurteMusica.xml', function (likesMusic) {
