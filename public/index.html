@@ -1,158 +1,64 @@
 <!doctype html>
-<html ng-app="recomend">
+<html ng-app>
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
         <script type="text/javascript">
-            /*global angular */
             
-            angular.module('recomend', []).config(function ($routeProvider) {
+            function Ctrl ($scope, $http) {
+
+                $scope.showband = false;
+                $scope.showmovie = false;
+                $scope.showfriend = false;
+
+                $scope.login = function () {
+                    $http.get('/person/' + $scope.user.uri).success(function (data) {
+                        console.log(data)
+                        $scope.bands = data.person.likes.bands;
+                        $scope.movies = data.person.likes.movies;
+                        $scope.friends = data.person.knows;
+                        $scope.recomendations = data.person.recomendations
+                        $scope.name = data.person.name
+                    });
+                };
+
+                $scope.like = function (rating) {
+                    $http.post('/person/' + $scope.user.uri + '/like', {
+                        culturalAct : $scope.newlike,
+                        rating : rating
+                    }).success(function (data) {
+                        $scope.newlike = "";
+                        $scope.login();
+                    })
+                }
+
+                $scope.likeBand = function (act, rating) {
+                    $http.post('/person/' + $scope.user.uri + '/like', {
+                        culturalAct : 'http://en.wikipedia.org/wiki/' + act.name,
+                        rating : rating
+                    }).success(function (data) {
+                        $scope.login();
+                    })
+                }
+
+                $scope.likeMovie = function (act, rating) {
+                    $http.post('/person/' + $scope.user.uri + '/like', {
+                        culturalAct : act.name,
+                        rating : rating
+                    }).success(function (data) {
+                        $scope.login();
+                    })
+                }
+
+                $scope.knowFriend = function (friend) {
+                    $http.post('/person/' + $scope.user.uri + '/know', {
+                        colleague : friend.name
+                    }).success(function (data) {
+                        $scope.login();
+                    })
+                }
+
+            }
             
-                $routeProvider.
-                /* Pagina inicial */
-                when('/', {
-                    templateUrl : '/views/login.tpl.html',
-                    controller : function ($rootScope, $scope, $http, $location) {
-                        
-                        $scope.login = function () {
-                            $location.path('/recomendar');
-                        };
-                        
-                    }
-                }).
-                /* pagina de recomendações */
-                when('/recomendacoes', {
-                    templateUrl : '/views/recomend.tpl.html',
-                    controller : function ($rootScope, $scope, $http, $location) {
-                    
-                        $scope.recomendations= {
-                            bands : [
-                                {
-                                    name : 'teste 1'
-                                },
-                                {
-                                    name : 'teste 2'
-                                },
-                                {
-                                    name : 'teste 3'
-                                }
-                            ],
-                            movies : [
-                                {
-                                    name : 'teste 1'
-                                },
-                                {
-                                    name : 'teste 2'
-                                },
-                                {
-                                    name : 'teste 3'
-                                }
-                            ],
-                            friends : [
-                                {
-                                    name : 'teste 1'
-                                },
-                                {
-                                    name : 'teste 2'
-                                },
-                                {
-                                    name : 'teste 3'
-                                }
-                            ]
-                        }
-                    
-                        $scope.like = function () {
-                            
-                        };
-                        
-                    }
-                }).
-                /* pagina de minhas musicas */
-                when('/bandas', {
-                    templateUrl : '/views/bands.tpl.html',
-                    controller : function ($rootScope, $scope, $http, $location) {
-                    
-                        $scope.likes = [
-                            {
-                                name : 'teste 1'
-                            },
-                            {
-                                name : 'teste 2'
-                            },
-                            {
-                                name : 'teste 3'
-                            }
-                        ];
-                    
-                        $scope.like = function () {
-                            
-                        };
-                        
-                        $scope.unlike = function (band) {
-                            
-                        };
-                    
-                    }
-                }).
-                /* pagina de meus filmes */
-                when('/filmes', {
-                    templateUrl : '/views/movies.tpl.html',
-                    controller : function ($rootScope, $scope, $http, $location) {
-                    
-                        $scope.likes = [
-                            {
-                                name : 'teste 1'
-                            },
-                            {
-                                name : 'teste 2'
-                            },
-                            {
-                                name : 'teste 3'
-                            }
-                        ];
-                    
-                        $scope.like = function () {
-                            
-                        };
-                        
-                        $scope.unlike = function (movie) {
-                            
-                        };
-                    
-                    }
-                }).
-                /* pagina de meus amigos */
-                when('/amigos', {
-                    templateUrl : '/views/friends.tpl.html',
-                    controller : function ($rootScope, $scope, $http, $location) {
-                    
-                        $scope.friends = [
-                            {
-                                name : 'teste 1'
-                            },
-                            {
-                                name : 'teste 2'
-                            },
-                            {
-                                name : 'teste 3'
-                            }
-                        ];
-                    
-                        $scope.know = function () {
-                            
-                        };
-                        
-                        $scope.unknow = function (friend) {
-                            
-                        };
-                    
-                    }
-                }).
-                /* pagina não encontrada */
-                otherwise({
-                    redirectTo: '/'
-                });
-            
-            });
         </script>
         <style>
             body {
@@ -165,24 +71,22 @@
                 margin: 50px auto;
                 background-color: black;
                 border-radius:10px;
+                color: #fff;
             }
             
-            .header h1 {
-                color: #fff;
+            h1 {
                 font-size:14px;
             }
-            .header h2 {
-                color: #fff;
+            h2 {
                 font-size:10px;
             }
             
             .like { 
                 width: 840px;
-                margin: -30px auto;
+                margin: 10px auto;
                 padding:10px 20px;
                 border-radius:10px;
                 box-shadow: 0 0 40px rgba(0,0,0,0.4);
-                color:#999;
             }
             
             .like input.filter { 
@@ -191,7 +95,6 @@
                 border:none;
                 border-bottom:solid 1px #ccc;
                 background:none;
-                color:#ccc;
                 margin:0 25px 0 0;
             }
             
@@ -204,31 +107,29 @@
                 cursor:pointer;
             }
             
-            .musics {
-                padding: 20px 40px;
+            .list {
                 width: 800px;
-                margin: 50px auto;
+                margin: 0 auto;
                 border-radius:10px;
             }
             
-            .musics h3 {
+            .list h3 {
                 font-size:12px;
             }
             
-            .musics ol {
+            .list ol {
                 list-style:none;
-                margin:0;
             }
             
-            .musics ol li.music {
-                margin:10px;
+            .list ol li.like {
+                margin:10px 0;
                 font-size:10px;
                 padding:10px 20px;
                 border-radius:10px;
                 box-shadow: 0 0 2px rgba(0,0,0,0.4);
             }
             
-            .musics ol li.music .vote { 
+            .list ol li.like .vote { 
                 background-image:-moz-linear-gradient(center top , #FEE94F 0px, #FD9A0F 100%);
                 border: solid 2px #FFAA22;
                 border-radius:40px;
@@ -237,95 +138,103 @@
                 padding: 2px;
                 margin-left:-10px;
                 margin-right:10px;
+                cursor: pointer;
             }
         </style>
     </head>
-    <body>
+    <body ng-controller="Ctrl">
         <div class="header">
             <h1>
                 sistema de recomendações
             </h1>
             <h2>
+                <form ng-submit="login()">
+                    <input type="text" ng-model="user.uri" />
+                    <input type="submit" value="logar" />
+                </form>
+            </h2>
+            <h2>
                 nos conte o que você curte e podemos te ajudar a conhecer novos filmes, musicas e amigos.
             </h2>
         </div>
-        <div class="like">
-            <input type="text" class="filter" value="http://" />
-            <input type="submit" class="vote" value="+1" />
-            <input type="submit" class="vote" value="+2" />
-            <input type="submit" class="vote" value="+3" />
-            <input type="submit" class="vote" value="+4" />
-            <input type="submit" class="vote" value="+5" />
-        </div>
-        <div class="musics">
+        <div class="list" ng-show="name">
             <h3>
-                as musicas que voce curte
+                ola {{name}}
+            </h3>
+        </div>
+        <div class="like" ng-show="name">
+            <input type="text" class="filter" ng-model="newlike" placeholder="digite a uri da banda ou filme que você deseja curtir" />
+            <input type="submit" class="vote" value="1" ng-click="like(1)" />
+            <input type="submit" class="vote" value="2" ng-click="like(2)" />
+            <input type="submit" class="vote" value="3" ng-click="like(3)" />
+            <input type="submit" class="vote" value="4" ng-click="like(4)" />
+            <input type="submit" class="vote" value="5" ng-click="like(5)" />
+        </div>
+        <div class="list" ng-show="bands">
+            <h3>
+                as bandas que recomendamos para você!
             </h3>
             <ol>
-                <li class="music">
-                    <span class="vote">+3</span>
-                    Lynird Skynird
-                </li>
-                <li class="music">
-                    <span class="vote">+3</span>
-                    Lynird Skynird
-                </li>
-                <li class="music">
-                    <span class="vote">+3</span>
-                    Lynird Skynird
-                </li>
-                <li class="music">
-                    <span class="vote">+3</span>
-                    Lynird Skynird
-                </li>
-                <li class="music">
-                    <span class="vote">+3</span>
-                    Lynird Skynird
+                <li class="like"  ng-repeat="recommend in recomendations.bands">
+                    <span class="vote" ng-click="likeBand(recommend, 1)">1</span>
+                    <span class="vote" ng-click="likeBand(recommend, 2)">2</span>
+                    <span class="vote" ng-click="likeBand(recommend, 3)">3</span>
+                    <span class="vote" ng-click="likeBand(recommend, 4)">4</span>
+                    <span class="vote" ng-click="likeBand(recommend, 5)">5</span>
+                    {{recommend.name}}
                 </li>
             </ol>
+            <h3 ng-click="showband = !showband">
+                as bandas que voce curte (clique para expandir)
+            </h3>
+            <ol ng-show="showband">
+                <li class="like" ng-repeat="band in bands">
+                    <span class="vote">{{band.rating}}</span>
+                    {{band.culturalAct}}
+                </li>
+            </ol>
+        </div>
+        <div class="list" ng-show="movies">
             <h3>
-                o que recomendamos para você!
+                os filmes que recomendamos para você!
             </h3>
             <ol>
-                <li class="music">
-                    <span class="vote">+1</span>
-                    <span class="vote">+2</span>
-                    <span class="vote">+3</span>
-                    <span class="vote">+4</span>
-                    <span class="vote">+5</span>
-                    Lynird Skynird
+                <li class="like"  ng-repeat="recommend in recomendations.movies">
+                    <span class="vote" ng-click="likeMovie(recommend, 1)">1</span>
+                    <span class="vote" ng-click="likeMovie(recommend, 2)">2</span>
+                    <span class="vote" ng-click="likeMovie(recommend, 3)">3</span>
+                    <span class="vote" ng-click="likeMovie(recommend, 4)">4</span>
+                    <span class="vote" ng-click="likeMovie(recommend, 5)">5</span>
+                    {{recommend.name}}
                 </li>
-                <li class="music">
-                    <span class="vote">+1</span>
-                    <span class="vote">+2</span>
-                    <span class="vote">+3</span>
-                    <span class="vote">+4</span>
-                    <span class="vote">+5</span>
-                    Lynird Skynird
+            </ol>
+            <h3 ng-click="showmovie = !showmovie">
+                os filmes que voce curte (clique para expandir)
+            </h3>
+            <ol ng-show="showmovie">
+                <li class="like" ng-repeat="movie in movies">
+                    <span class="vote">{{movie.rating}}</span>
+                    {{movie.culturalAct}}
                 </li>
-                <li class="music">
-                    <span class="vote">+1</span>
-                    <span class="vote">+2</span>
-                    <span class="vote">+3</span>
-                    <span class="vote">+4</span>
-                    <span class="vote">+5</span>
-                    Lynird Skynird
+            </ol>
+        </div>
+
+        <div class="list" ng-show="friends">
+            <h3>
+                os amigos que recomendamos para você!
+            </h3>
+            <ol>
+                <li class="like"  ng-repeat="recommend in recomendations.friends">
+                    <span class="vote" ng-click="knowFriend(recommend)">Adicionar Amigo</span>
+                    {{recommend.name}}
                 </li>
-                <li class="music">
-                    <span class="vote">+1</span>
-                    <span class="vote">+2</span>
-                    <span class="vote">+3</span>
-                    <span class="vote">+4</span>
-                    <span class="vote">+5</span>
-                    Lynird Skynird
-                </li>
-                <li class="music">
-                    <span class="vote">+1</span>
-                    <span class="vote">+2</span>
-                    <span class="vote">+3</span>
-                    <span class="vote">+4</span>
-                    <span class="vote">+5</span>
-                    Lynird Skynird
+            </ol>
+            <h3 ng-click="showfriend = !showfriend">
+                os amigos que voce conhece (clique para expandir)
+            </h3>
+            <ol ng-show="showfriend">
+                <li class="like" ng-repeat="friend in friends">
+                    {{friend.colleague}}
                 </li>
             </ol>
         </div>

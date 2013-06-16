@@ -50,29 +50,7 @@ app.get("/person/:id", findPerson, function (request, response) {
     response.send({person : request.person});
 });
 
-/* Amigos */
-app.post("/person/:id/friends", findPerson, function (request, response) {
-    var know = new model.Know({
-        person    : request.params.id,
-        colleague : request.param('colleague')
-    });
-
-    know.save(function () {
-        response.send({know : know});
-    });
-});
-
-app.del("/person/:id/friends/:friend_id", findPerson, function (request, response) {
-    for (var i in request.person.knows) {
-        if (request.person.knows[i].colleague === request.params.friend_id) {
-            request.person.knows[i].remove();
-        }
-    }
-    response.send(null);
-});
-
-/* Filmes */
-app.post("/person/:id/movies", function (request, response) {
+app.post("/person/:id/like", function (request, response) {
     var like = new model.Like({
         person      : request.params.id,
         culturalAct : request.param('culturalAct'),
@@ -84,7 +62,7 @@ app.post("/person/:id/movies", function (request, response) {
     });
 });
 
-app.del("/person/:id/movies/:like_id", findPerson, function (request, response) {
+app.del("/person/:id/like/:like_id", findPerson, function (request, response) {
     for (var i in request.person.likes.movies) {
         if (request.person.likes.movies[i].culturalAct === request.params.like_id) {
             request.person.likes.movies[i].remove();
@@ -93,28 +71,15 @@ app.del("/person/:id/movies/:like_id", findPerson, function (request, response) 
     response.send(null);
 });
 
-/* Musicas */
-app.post("/person/:id/bands", function (request, response) {
-    var like = new model.Like({
+app.post("/person/:id/know", function (request, response) {
+    var know = new model.Know({
         person      : request.params.id,
-        culturalAct : request.param('culturalAct'),
-        rating      : request.param('rating')
+        colleague   : request.param('colleague')
     });
 
-    like.save(function () {
-        response.send({like : like});
+    know.save(function () {
+        response.send({know : know});
     });
 });
-
-app.del("/person/:id/bands/:like_id", function (request, response) {
-    for (var i in request.person.likes.bands) {
-        if (request.person.likes.bands[i].culturalAct === request.params.like_id) {
-            request.person.likes.bands[i].remove();
-        }
-    }
-    response.send(null);
-});
-
-model.Country.find('asudhfiaudsfh');
 
 app.listen(process.env.PORT || 8080);

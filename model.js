@@ -668,8 +668,13 @@ var Movie = function (params) {
  * @param cb
  */
 Movie.find = function (name, cb) {
+    var method = "t=";
+    if(name[0] == 't' && name[1] == 't') {
+        method = "i=";
+    }
+    
     Get(
-        "http://www.omdbapi.com/?i=" + name,
+        "http://www.omdbapi.com/?" + method + name,
         function (tempMovie) {
 
             var directors = [],
@@ -1866,7 +1871,7 @@ Person.find = function (id, cb) {
             });
             
             /* Pegando as musicas curtidas */
-            db('SELECT `like`.`culturalAct`, `like`.`person` FROM `like`, `band` WHERE `like`.`person` = "' + id + '" AND `band`.`name` = `like`.`culturalAct`', {}, function (err, likes) {
+            db('SELECT `like`.`culturalAct`, `like`.`rating`, `like`.`person` FROM `like`, `band` WHERE `like`.`person` = "' + id + '" AND `band`.`name` = `like`.`culturalAct` ORDER BY `like`.`rating` DESC', {}, function (err, likes) {
                 for (var i in likes) {
                     person.likes.bands.push(new Like(likes[i]));
                 }
@@ -1879,8 +1884,8 @@ Person.find = function (id, cb) {
                 }
             });
             
-            /* Pegando os filmes curtidos curtidas */
-            db('SELECT `like`.`culturalAct`, `like`.`person` FROM `like`, `movie` WHERE `like`.`person` = "' + id + '" AND `movie`.`name` = `like`.`culturalAct`', {}, function (err, likes) {
+            /* Pegando os filmes curtidos */
+            db('SELECT `like`.`culturalAct`, `like`.`rating`, `like`.`person` FROM `like`, `movie` WHERE `like`.`person` = "' + id + '" AND `movie`.`name` = `like`.`culturalAct` ORDER BY `like`.`rating` DESC', {}, function (err, likes) {
                 for (var i in likes) {
                     person.likes.movies.push(new Like(likes[i]));
                 }
