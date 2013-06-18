@@ -106,8 +106,7 @@ Country.find = function (name, cb) {
                 else {
                 var place = data.resourceSets[0].resources[0].address.countryRegion;
                 
-                }    
-                console.log(place);
+                }
                 
                 if (!place) {
                     return cb(null);
@@ -1386,7 +1385,9 @@ var Person = function (params) {
         var query1 = function(cb){
             //Pessoas que conhecem self.uri mas não são conhecidas por self.uri
             db(
-                'select a.person from know a where a.colleague = "'+self.uri+'" and a.person not in( select colleague from know where person = "'+self.uri+'")',
+                'select p.name person from know a, person p where a.colleague = "'+self.uri+
+                '" and a.person not in( select colleague from know where person = "'+self.uri+'")'+
+                ' and a.person = p.uri',
                 {},
                 cb
             );
@@ -1395,7 +1396,11 @@ var Person = function (params) {
         var query2 = function(cb){
             //Regra de Associação para 2 pessoas (amigos de X também são amigos de Y)
             db(
-                'SELECT a.recommend recommend, MAX(a.value) value FROM know k, linkPeopleView a WHERE k.person = "'+self.uri+'" AND k.colleague = a.colleague AND a.recommend not in ( select p.colleague from know p WHERE p.person = "'+self.uri+'")AND a.recommend <> "'+self.uri+'" GROUP BY a.recommend ORDER BY value desc',
+                'SELECT p.name recommend, MAX(a.value) value FROM know k, linkPeopleView a, person p'+
+                ' WHERE k.person = "'+self.uri+'" AND k.colleague = a.colleague '+
+                ' AND a.recommend = p.uri AND a.recommend not in ('+
+                    ' select p.colleague from know p WHERE p.person = "'+self.uri+
+                    '")AND a.recommend <> "'+self.uri+'" GROUP BY a.recommend ORDER BY value desc',
                 {},
                 cb
             );
@@ -1404,7 +1409,11 @@ var Person = function (params) {
         var query3 = function(cb){
             //Pessoas com grupos de amigos em comum
             db(
-                'select b.person, count(*) commonFriends from know a, know b where b.person not in( select colleague from know where person = "'+self.uri+'" ) and a.colleague = b.colleague and a.person = "'+self.uri+'" and a.person <> b.person group by b.person order by commonFriends desc',
+                'select p.name person, count(*) commonFriends from know a, know b, person p'+
+                ' where b.person not in( select colleague from know where person = "'+self.uri+'" ) '+
+                'and a.colleague = b.colleague and a.person = "'+self.uri+'" and a.person <> b.person '+
+                'and b.person = p.uri '+
+                'group by b.person order by commonFriends desc',
                 {},
                 cb
             );
@@ -1413,7 +1422,12 @@ var Person = function (params) {
         var query4 = function(cb){
             //Pessoas com gostos parecidos
             db(
-                'select b.person, COUNT(*) commonLikes, sum(5-abs(a.rating-b.rating))/count(*) + 0.4*count(*) Value from `like` a, `like` b where a.person = "'+self.uri+'" and b.person <> a.person and b.person not in( select colleague from know where person = "'+self.uri+'" ) and a.culturalAct = b.culturalAct group by b.person order by Value desc, commonLikes desc',
+                'select p.name person, COUNT(*) commonLikes, sum(5-abs(a.rating-b.rating))/count(*) + 0.4*count(*) Value '+
+                'from `like` a, `like` b, person p where b.person = p.uri and '+
+                ' a.person = "'+self.uri+'" and b.person <> a.person '+
+                'and b.person not in( select colleague from know where person = "'+self.uri+'" ) '+
+                'and a.culturalAct = b.culturalAct '+
+                'group by b.person order by Value desc, commonLikes desc',
                 {},
                 cb
             );
@@ -1422,7 +1436,10 @@ var Person = function (params) {
         var query5 = function(cb){
             //Pessoas que os amigos conhecem
             db(
-                'select b.colleague person, count(*) knownByFriends from know a, know b where a.person = "'+self.uri+'" AND a.colleague = b.person AND b.colleague not in( select colleague from know where person = "'+self.uri+'" ) AND b.colleague <> a.person group by b.colleague order by knownByFriends desc',
+                'select p.name person, count(*) knownByFriends from know a, know b, person p '+
+                ' where b.colleague = p.uri and a.person = "'+self.uri+'" AND a.colleague = b.person '+
+                'AND b.colleague not in( select colleague from know where person = "'+self.uri+'" ) '+
+                'AND b.colleague <> a.person group by b.colleague order by knownByFriends desc',
                 {},
                 cb
             );
@@ -1431,6 +1448,7 @@ var Person = function (params) {
         var pickBetter = function (set1, set2, set3, set4, set5, cb) {
             var results = {};
             var k;
+
 
             for(var i in set1) {
                 if(results[set1[i].person]){
@@ -1567,8 +1585,87 @@ var Person = function (params) {
             );
         };
 
+        var query5 = function(cb){
+            //filmes com elenco em comum com os curtidos
+            db(
+                'create view MoviesWithActorsBy'+self.uri+' as '+
+                'select a.movie Movie, a.actor Actor, count(*) ActorLikedNTimes '+
+                'from `like` l, `act` a, `act` a2 '+
+                'where  l.person = "'+self.uri+'" '+
+                     'AND a2.movie = l.culturalAct '+
+                     'AND a2.actor = a.actor '+
+                     'AND a.movie not in '+
+                     '( '+
+                     'select culturalAct '+
+                     'from `like` l '+
+                     'where l.person = "'+self.uri+'" '+
+                     ') '+
+                'group by a.movie, a.actor; ',
+                {},
+                function (err1) {
+                    db( 
+                        'select Movie, count(*) vezes, AVG(ActorLikedNTimes) MediaDeVezes, count(*)+0.5*AVG(ActorLikedNTimes) value '+
+                         'from MoviesWithActorsBy'+self.uri+' '+
+                         'group by Movie '+
+                         'order by value desc; ',
+                        {},
+                        function (err2, data) {
+                            db(
+                                'drop view MoviesWithActorsBy'+self.uri+';',
+                                {},
+                                function (err3) {
+                                    if(err1 || err2 || err3)
+                                        console.log("Actors: err1: "+err1+"   err2: "+err2+"   err3: "+err3)
+                                    cb(err3, data);
+                                }
+                            );
+                        }
+                    );
+                }
+            );
 
-        var pickBetter = function (set1, set2, set3, set4, cb) {
+        }
+
+        var query6 = function(cb){
+            //filmes com diretores em comum com os curtidos
+            db(
+                  'create view MoviesWithDirectorsBy'+self.uri+ ' as  '+
+                      'select d.movie Movie, d.director Director, count(*) DirectorLikedNTimes '+
+                      'from `like` l, `direct` d, `direct` d2 '+
+                      'where   l.person = " '+self.uri+ '" '+
+                             'AND d2.movie = l.culturalAct '+
+                             'AND d2.director = d.director '+
+                             'AND d.movie not in '+
+                             '( '+
+                             'select culturalAct '+
+                             'from `like` l '+
+                             'where l.person = " '+self.uri+ '" '+
+                             ') '+
+                      'group by d.movie, d.director;  ',
+                {},
+                function (err1) {
+                    db(                 
+                      'select Movie, count(*) vezes, AVG(DirectorLikedNTimes) MediaDeVezes, count(*)+0.5*AVG(DirectorLikedNTimes) value '+
+                          'from MoviesWithDirectorsBy'+self.uri+ ' '+
+                          'group by Movie '+
+                          'order by value desc; ',
+                    {},
+                    function (err2, data) {
+                        db(
+                            'drop view MoviesWithDirectorsBy'+self.uri+';',
+                            {},
+                            function (err3) {
+                                if(err1 || err2 || err3)
+                                    console.log("Director: err1: "+err1+" err2: "+err2+"   err3: "+err3)
+                                cb(err3, data);
+                            }
+                        );
+                    });
+                }
+            );
+        }        
+
+        var pickBetter = function (set1, set2, set3, set4, set5, set6, cb) {
             var results = {};
             var k;
 
@@ -1608,6 +1705,24 @@ var Person = function (params) {
                 }
             }
 
+            for(var i in set5) {
+                if(results[set5[i].Movie]){
+                    results[set5[i].Movie] += 0.7*set5[i].value/set5[0].value;
+                }
+                else {
+                    results[set5[i].Movie] = 0.7*set5[i].value/set5[0].value;
+                }
+            }
+
+            for(var i in set6) {
+                if(results[set6[i].Movie]){
+                    results[set6[i].Movie] += set6[i].value/set6[0].value;
+                }
+                else {
+                    results[set6[i].Movie] = set6[i].value/set6[0].value;
+                }
+            }
+
             var set = [];
             for (var i in results) {
                 set.push({
@@ -1622,35 +1737,49 @@ var Person = function (params) {
         };
 
         
-        var q1 = false, q2 = false, q3 = false, q4 = false;
-        var set1, set2, set3, set4;
+        var q1 = false, q2 = false, q3 = false, q4 = false, q5 = false, q6 = false;
+        var set1, set2, set3, set4, set5, set6;
 
         query1( function (err, set) {
             set1 = set;
             q1 = true;
-            if(q1 && q2 && q3 && q4)
-                pickBetter(set1, set2, set3, set4, cb);
+            if(q1 && q2 && q3 && q4 && q5 && q6)
+                pickBetter(set1, set2, set3, set4, set5, set6, cb);
         });
 
         query2( function (err, set) {
             set2 = set;
             q2 = true;
-            if(q1 && q2 && q3 && q4)
-                pickBetter(set1, set2, set3, set4, cb);
+            if(q1 && q2 && q3 && q4 && q5 && q6)
+                pickBetter(set1, set2, set3, set4, set5, set6, cb);
         });
 
         query3( function (err, set) {
             set3 = set;
             q3 = true;
-            if(q1 && q2 && q3 && q4)
-                pickBetter(set1, set2, set3, set4, cb);
+            if(q1 && q2 && q3 && q4 && q5 && q6)
+                pickBetter(set1, set2, set3, set4, set5, set6, cb);
         });
 
         query4( function (err, set) {
             set4 = set;
             q4 = true;
-            if(q1 && q2 && q3 && q4)
-                pickBetter(set1, set2, set3, set4, cb);
+            if(q1 && q2 && q3 && q4 && q5 && q6)
+                pickBetter(set1, set2, set3, set4, set5, set6, cb);
+        });
+
+        query5( function (err, set) {
+            set5 = set;
+            q5 = true;
+            if(q1 && q2 && q3 && q4 && q5 && q6)
+                pickBetter(set1, set2, set3, set4, set5, set6, cb);
+        });
+    
+        query6( function (err, set) {
+            set6 = set;
+            q6 = true;
+            if(q1 && q2 && q3 && q4 && q5 && q6)
+                pickBetter(set1, set2, set3, set4, set5, set6, cb);
         });
     };
 
@@ -1705,7 +1834,6 @@ var Person = function (params) {
             var results = {};
             var k;
 
-            console.log(set2)
             for(var i in set1) {
                 if(results[set1[i].act]){
                     results[set1[i].act] += 2*set1[i].value/set1[0].value;
