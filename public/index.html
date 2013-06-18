@@ -170,7 +170,7 @@
             <input type="submit" class="vote" value="4" ng-click="like(4)" />
             <input type="submit" class="vote" value="5" ng-click="like(5)" />
         </div>
-        <div class="list" ng-show="bands">
+        <div class="list" ng-show="name">
             <h3>
                 as bandas que recomendamos para você!
             </h3>
@@ -184,17 +184,19 @@
                     {{recommend.name}}
                 </li>
             </ol>
-            <h3 ng-click="showband = !showband">
-                as bandas que voce curte (clique para expandir)
-            </h3>
-            <ol ng-show="showband">
-                <li class="like" ng-repeat="band in bands">
-                    <span class="vote">{{band.rating}}</span>
-                    {{band.culturalAct}}
-                </li>
-            </ol>
+            <div ng-show="bands">
+                <h3 ng-click="showband = !showband">
+                    as bandas que voce curte (clique para expandir)
+                </h3>
+                <ol ng-show="showband">
+                    <li class="like" ng-repeat="band in bands">
+                        <span class="vote">{{band.rating}}</span>
+                        {{band.culturalAct}}
+                    </li>
+                </ol>
+            </div>
         </div>
-        <div class="list" ng-show="movies">
+        <div class="list" ng-show="name">
             <h3>
                 os filmes que recomendamos para você!
             </h3>
@@ -208,15 +210,17 @@
                     {{recommend.name}}
                 </li>
             </ol>
-            <h3 ng-click="showmovie = !showmovie">
-                os filmes que voce curte (clique para expandir)
-            </h3>
-            <ol ng-show="showmovie">
-                <li class="like" ng-repeat="movie in movies">
-                    <span class="vote">{{movie.rating}}</span>
-                    {{movie.culturalAct}}
-                </li>
-            </ol>
+            <div ng-show="movies">
+                <h3 ng-click="showmovie = !showmovie">
+                    os filmes que voce curte (clique para expandir)
+                </h3>
+                <ol ng-show="showmovie">
+                    <li class="like" ng-repeat="movie in movies">
+                        <span class="vote">{{movie.rating}}</span>
+                        {{movie.culturalAct}}
+                    </li>
+                </ol>
+            </div>
         </div>
 
         <div class="list" ng-show="friends">

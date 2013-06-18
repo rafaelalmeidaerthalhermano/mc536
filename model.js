@@ -1799,7 +1799,7 @@ var Person = function (params) {
         var query1 = function(cb){
             //Bandas curtidas pelos amigos levando em consideracao as notas atribuidas
             db(
-                ' select l.culturalAct act, AVG(rating) averageRating, count(*) likedByFriends, AVG(rating)+0.5*count(*) value'+
+                'select l.culturalAct act, AVG(rating) averageRating, count(*) likedByFriends, AVG(rating)+0.5*count(*) value'+
                 ' from `like` l, know k where k.person = "'+self.uri+'" AND k.colleague = l.person '+
                 'AND l.culturalAct not in( select culturalAct from `like` where person = "'+self.uri+'" ) '+
                 'AND l.culturalAct in( select name from band ) group by l.culturalAct order by value desc',
